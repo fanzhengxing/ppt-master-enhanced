@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+*.log
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.bak
+*~
+*.swp
