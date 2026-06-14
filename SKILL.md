@@ -1,8 +1,8 @@
 ---
 name: ppt-master
 description: >-
-  AI-driven PPT generation — converts PDF/DOCX/Markdown/URL into native editable
-  .pptx presentations. Built on the SVG→DrawingML pipeline (26k⭐ ppt-master).
+  AI-driven PPT generation — converts PDF/DOCX/Markdown/URL/text topic into native editable
+  .pptx presentations. SVG→DrawingML pipeline (ppt-master-enhanced).
   Multi-role collaboration: Strategist (content planning) → Executor (SVG authoring)
   → Post-processing (native PPTX export). Works on Hermes, Claude Code, Codex,
   OpenClaw, and any skill-compatible runtime.
@@ -81,7 +81,7 @@ ppt-master/
 ├── test-prompts.json           ← Acceptance test prompts
 ├── requirements.txt            ← Python dependencies
 │
-├── scripts/                    ← 41 Python scripts (pipelines, utilities)
+├── scripts/                    ← 42+ Python scripts (pipelines, utilities)
 │   ├── source_to_md/           ← Document conversion (pdf, docx, excel, web)
 │   ├── project_manager.py      ← Init / validate / manage projects
 │   ├── svg_quality_checker.py  ← SVG validation
@@ -91,13 +91,20 @@ ppt-master/
 │   ├── image_search.py         ← Web image search
 │   ├── ...                     ← 28+ more (see scripts/ directory)
 │
-├── workflows/                  ← 11 standalone workflows
-│   ├── topic-research.md       ← Web research when no source files
+├── workflows/                  ← 13 standalone workflows
+│   ├── topic-research.md       ← Web research (standard + Deep Research)
 │   ├── template-fill-pptx.md   ← Fill existing PPTX template
 │   ├── create-template.md      ← Create new layout/brand/deck template
 │   ├── resume-execute.md       ← Split-mode execution (Phase A → B)
 │   ├── verify-charts.md        ← Chart coordinate calibration
-│   └── ...                     ← customize-animations, live-preview, etc.
+│   ├── customize-animations.md ← Animation tuning
+│   ├── live-preview.md         ← Browser preview during gen
+│   ├── visual-quality-check.md ← Visual quality inspection
+│   ├── presenter-view.md       ← HTML presenter view
+│   ├── visual-review.md        ← Per-page rubric check
+│   ├── generate-audio.md       ← Voiceover generation
+│   ├── create-brand.md         ← Brand-only identity preset
+│   └── image-to-pptx.md        ← Image/screenshot → editable PPTX
 │
 ├── references/                 ← Role definitions & technical constraints
 │   ├── strategist.md, executor-base.md, shared-standards.md

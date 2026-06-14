@@ -6,7 +6,7 @@
 > 本地执行，不依赖任何外部 API。SVG→DrawingML 管线，原生形状、动画、演讲备注全保留。
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-ppt--master-blueviolet)](SKILL.md)
-[![GitHub Stars](https://img.shields.io/github/stars/hugohe3/ppt-master?style=flat&color=yellow)](https://github.com/hugohe3/ppt-master)
+[![Stars](https://img.shields.io/github/stars/fanzhengxing/ppt-master-enhanced?style=flat&color=yellow)](https://github.com/fanzhengxing/ppt-master-enhanced)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Hermes · Claude Code · Codex · OpenClaw · 任何 skill-compatible runtime**
