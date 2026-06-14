@@ -1,14 +1,11 @@
-__pycache__/
+# PPT Master
 *.pyc
-*.pyo
-.DS_Store
-Thumbs.db
+__pycache__/
+.env
+.git/
+projects/
+exports/
+temp/
+*.tmp
 *.log
-*.egg-info/
-dist/
-build/
-.venv/
-venv/
-*.bak
-*~
-*.swp
+image2pptx_runs/
