@@ -333,7 +333,25 @@ Then dispatch per `Acquire Via`:
 | Via | Load | Run |
 |-----|------|-----|
 | `ai` | `references/image-generator.md` | `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
+| `ai (agnes)` | `references/agnes-ai-image-provider.md` | ⚠️ **Do NOT use `image_gen.py`** — its OpenAI backend sends `response_format` param that Agnes rejects (400). Call Agnes API directly via Python `requests.post()` with minimal params (`model`/`prompt`/`n`/`size` only). See key handling below. |
 | `web` | `references/image-searcher.md` | `python3 ${SKILL_DIR}/scripts/image_search.py ...` |
+
+> **⚠️ CRITICAL — Agnes API key handling**: Never let API key go through bash variable expansion. Always read from `.env` inside Python:
+> ```python
+> # Safe: Python reads .env directly (no bash expansion risk)
+> with open(".env") as f:
+>     for line in f:
+>         if line.startswith("OPENAI_API_KEY"):
+>             key = line.strip().split("=", 1)[1]
+>             break
+> r = requests.post(f"{base}/images/generations",
+>     json={"model": "agnes-image-2.1-flash", "prompt": "...", "n": 1, "size": "1024x1024"},
+>     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+>     timeout=120)
+> # Download returned URL:
+> img = requests.get(r.json()["data"][0]["url"], timeout=30)
+> ```
+> For bash heredoc, ALWAYS use single-quoted delimiter: `python3 << 'PYEOF'` (NOT `python3 << EOF`).
 
 Workflow:
 1. Extract all rows with `Status: Pending`, `Acquire Via ∈ {ai, web}`

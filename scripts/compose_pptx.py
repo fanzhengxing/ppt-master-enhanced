@@ -24,6 +24,7 @@ from pptx.util import Emu, Pt
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.dml.color import RGBColor
 from pptx.oxml.ns import qn
+from pptx.enum.shapes import MSO_SHAPE
 
 EMU_PER_INCH = 914400
 
@@ -149,7 +150,7 @@ def build_pptx(deck: dict, out_path: Path):
                     # rounded rect via XML
                     spPr.getparent().remove(spPr)
                     # simplified: just keep as rectangle for now
-            shape.line.fill.background()  # no outline
+            shape.line.fill.background()  # no outline — safe-skip if spPr absent
 
         # 4. Icon/decoration images (positioned)
         for icon in slide_data.get("icons", []):
