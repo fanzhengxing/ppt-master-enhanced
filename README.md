@@ -36,26 +36,35 @@
 
 ## 快速开始
 
-> ⚡ **ppt-master-enhanced** 是我们自己的增强版，已经装在本机。  
-> 仓库地址：https://github.com/fanzhengxing/ppt-master-enhanced
+### 首次安装（新人从这里开始）
 
 ```bash
-# Hermes（已装好）
-让 AI 加载 ppt-master skill
-
-# Claude Code（已装好）
-# 直接对 AI 说：加载 ppt-master skill
-
-# 如果要从 GitHub 重新安装：
-cd ~/.claude/skills/ && git clone git@github.com:fanzhengxing/ppt-master-enhanced.git ppt-master
-# 以及：
+# Hermes Agent
 hermes skills install ppt-master
+
+# Claude Code
+cd ~/.claude/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
+
+# Codex / OpenClaw / Cursor 等
+# 下载源码到对应 skills 目录即可：
+git clone https://github.com/fanzhengxing/ppt-master-enhanced.git <skills_dir>/ppt-master
 ```
 
-装完对 AI 说：
+### 使用
+
+装完后对 AI 说：
 
 ```text
-帮我把这份文档做成 PPT：[文件路径/URL]
+加载 ppt-master skill
+```
+
+然后直接说需求：
+
+```text
+帮我把这份 PDF 做成 PPT：文件路径
+帮我把这篇论文做成答辩 PPT：文件路径
+根据这个 Excel 数据做一份汇报：文件路径
+帮我把这个网页内容做成演示：https://example.com
 ```
 
 ## 工作原理
