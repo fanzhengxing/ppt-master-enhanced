@@ -38,9 +38,12 @@
 
 ### 首次安装（新人从这里开始）
 
+本技能托管在 GitHub（https://github.com/fanzhengxing/ppt-master-enhanced），
+不是官方 skill 仓库。安装方式：
+
 ```bash
 # Hermes Agent
-hermes skills install ppt-master
+cd ~/.hermes/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
 
 # Claude Code
 cd ~/.claude/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
