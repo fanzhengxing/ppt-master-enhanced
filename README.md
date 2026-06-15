@@ -36,13 +36,10 @@
 
 ## 快速开始
 
-### 首次安装（新人从这里开始）
-
-本技能托管在 GitHub（https://github.com/fanzhengxing/ppt-master-enhanced），
-不是官方 skill 仓库。安装方式：
+### 方式一：Git 克隆（推荐）
 
 ```bash
-# Hermes Agent
+# Hermes Agent（已安装到 skills.sh 市场前，手动装）
 cd ~/.hermes/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
 
 # Claude Code
@@ -52,6 +49,10 @@ cd ~/.claude/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enh
 # 下载源码到对应 skills 目录即可：
 git clone https://github.com/fanzhengxing/ppt-master-enhanced.git <skills_dir>/ppt-master
 ```
+
+### 方式二：下载 ZIP 包
+
+从 [GitHub Releases](https://github.com/fanzhengxing/ppt-master-enhanced/releases) 下载最新版 `ppt-master-enhanced.zip`，解压到对应 runtime 的 skills 目录下即可。
 
 ### 使用
 
