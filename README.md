@@ -36,14 +36,20 @@
 
 ## 快速开始
 
-```bash
-# Hermes
-npx skills add LearnPrompt/luban-skill -g   # 先装鲁班 skill 管理
-# 或直接：让 AI 加载 ppt-master skill
+> ⚡ **ppt-master-enhanced** 是我们自己的增强版，已经装在本机。  
+> 仓库地址：https://github.com/fanzhengxing/ppt-master-enhanced
 
-# Claude Code
-/plugin marketplace add LearnPrompt/ppt-master
-# 或直接说：加载 ppt-master skill
+```bash
+# Hermes（已装好）
+让 AI 加载 ppt-master skill
+
+# Claude Code（已装好）
+# 直接对 AI 说：加载 ppt-master skill
+
+# 如果要从 GitHub 重新安装：
+cd ~/.claude/skills/ && git clone git@github.com:fanzhengxing/ppt-master-enhanced.git ppt-master
+# 以及：
+hermes skills install ppt-master
 ```
 
 装完对 AI 说：
