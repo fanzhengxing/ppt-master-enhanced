@@ -1,0 +1,39 @@
+{
+  "test_scenarios": [
+    {
+      "id": "test-001-pdf-to-pptx",
+      "name": "PDF 文档转 PPT",
+      "prompt": "帮我把这个 PDF 做成一个 10 页 PPT：[path/to/document.pdf]",
+      "expected_behavior": "触发 ppt-master 管线：Step 1 转 Markdown → Step 2 初始化项目 → Step 4 八项确认 → Step 6 生成 SVG → Step 7 导出 PPTX",
+      "verification": "产出 `<project>/exports/<name>_*.pptx`，可在 PowerPoint 中打开编辑"
+    },
+    {
+      "id": "test-002-markdown-to-pptx",
+      "name": "Markdown 转 PPT",
+      "prompt": "用 ppt-master 把这个 Markdown 做成PPT：[path/to/file.md]",
+      "expected_behavior": "跳过 Step 1（MD 直接读），从 Step 2 开始。八项确认停手等用户确认",
+      "verification": "用户确认后自动完成全部管线，产出 .pptx"
+    },
+    {
+      "id": "test-003-topic-only",
+      "name": "仅给主题无源文件",
+      "prompt": "帮我做一个关于 DeepSeek AI 的介绍 PPT，10页左右",
+      "expected_behavior": "触发 topic-research 工作流 → 上网搜集资料 → 回到 Step 1 常规管线",
+      "verification": "先问目标受众、风格偏好等，然后上网研究，再继续管线"
+    },
+    {
+      "id": "test-004-url-to-pptx",
+      "name": "网页转 PPT",
+      "prompt": "把这篇网页文章做成 PPT：[https://example.com/article]",
+      "expected_behavior": "Step 1 用 web_to_md.py 抓取，后续常规管线",
+      "verification": "产出基于网页内容的 .pptx"
+    },
+    {
+      "id": "test-005-template-with-brand",
+      "name": "指定模板 + 品牌",
+      "prompt": "用 academic_defense 模板帮我做一份论文答辩PPT，源文件：[path/to/thesis.md]。另外品牌色用医疗蓝"  ,
+      "expected_behavior": "Step 3 识别路径触发模板 → Step 4 八项确认包含风格调整",
+      "verification": "产出符合学术模板风格的 .pptx"
+    }
+  ]
+}
