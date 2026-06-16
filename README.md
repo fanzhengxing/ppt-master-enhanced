@@ -34,6 +34,7 @@
 - ✅ **入场动画** — 默认丰富动画，可定制
 - ✅ **多模板** — 学术答辩、政务蓝/红、医学大学、像素复古等 7+ 套布局
 - ✅ **HTML 演示文稿** — 自包含单文件 HTML，内联 CSS/JS，主题切换，演讲者视图
+- ✅ **全链路自包含** — 所有 CSS/JS 内联，无需外部资源，双击即用
 
 ### 效果展示
 
@@ -47,17 +48,18 @@
 
 ## 快速开始
 
-```bash
-# Hermes
-npx skills add LearnPrompt/luban-skill -g   # 先装鲁班 skill 管理
-# 或直接：让 AI 加载 ppt-master skill
+### 安装
 
-# Claude Code
-/plugin marketplace add LearnPrompt/ppt-master
-# 或直接说：加载 ppt-master skill
-```
+| 平台 | 方式 |
+|------|------|
+| **Hermes Agent** | 技能已内置，无需额外安装 |
+| **Claude Code** | 克隆仓库到 `~/.claude/skills/ppt-master/` |
+| **Codex CLI** | 克隆仓库到 `~/.codex/skills/ppt-master/` |
+| **GitHub ZIP** | 点击 [Download ZIP](https://github.com/fanzhengxing/ppt-master-enhanced/archive/refs/heads/main.zip) |
 
-装完对 AI 说：
+### 使用
+
+对 AI 说：
 
 ```text
 帮我把这份文档做成 PPT：[文件路径/URL]
@@ -101,20 +103,32 @@ npx skills add LearnPrompt/luban-skill -g   # 先装鲁班 skill 管理
 | 政务红色 | `templates/layouts/government_red/` | 党建、重要会议 |
 | 医科大学 | `templates/layouts/medical_university/` | 医学汇报、医院报告 |
 | 像素复古 | `templates/layouts/pixel_retro/` | 创意演示、hackathon |
-| 心理学 | `templates/layouts/psychology_attachment/` | 心理咨询、教育 |
+|| 心理学 | `templates/layouts/psychology_attachment/` | 心理咨询、教育 |
 
 ## 它和同类有什么不同？
 
-| | 普通 Agent 做 PPT | **PPT Master** |
+### HTML 演示文稿（新增）
+
+除了传统的 .pptx 输出，ppt-master 还支持生成 **自包含 HTML 演示文稿**：
+
+- **零依赖** — 所有 CSS、JS、字体全部内联到单个 HTML 文件
+- **主题切换** — 内置 corporate-clean、minimal-white 等多种主题
+- **演讲者视图** — 按 `S` 键进入，支持备注提示
+- **离线可用** — 无需网络连接，双击即可打开
+- **交付位置** — `exports/deck.html` 或 `assets/deck.html`
+
+> 适合快速预览、邮件发送、无 PPT 环境的演示场景。
+
+|| | 普通 Agent 做 PPT | **PPT Master** |
 |---|---|---|
 | 输出产物 | HTML / Markdown / 文字描述 | **原生 .pptx**（可编辑） |
 | 排版引擎 | AI 临时构思 | **SVG→DrawingML 管线** |
 | 模板系统 | 无 / 硬编码 | 7+ 套独立布局 + 品牌预设 |
 | 演讲备注 | 通常没有 | ✓ 自动生成 |
-| 动画 | 无 | ✓ 入场动画 + 页面切换 |
-| 外部依赖 | 常需要 API (Gamma/美图) | **纯本地**，无需任何外部服务 |
-| 脚本资产 | 无 | 41 个 Python 脚本 + 11 个工作流 |
-| 编辑性 | 不可编辑 / 需重新生成 | ✓ 在 PowerPoint 里直接改 |
+|| 动画 | 无 | ✓ 入场动画 + 页面切换 |
+|| 外部依赖 | 常需要 API (Gamma/美图) | **纯本地**，无需任何外部服务 |
+|| 脚本资产 | 无 | 41 个 Python 脚本 + 11 个工作流 |
+|| 编辑性 | 不可编辑 / 需重新生成 | ✓ 在 PowerPoint / WPS / Keynote 里直接改 |
 
 ## 安全边界
 
