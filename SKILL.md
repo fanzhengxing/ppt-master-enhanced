@@ -290,7 +290,7 @@ Import source content:
 
 **Multi-path fusion** (different kinds): Fuse segments by priority — brand wins identity, layout wins structure, deck fills middle. See full fusion matrix in `docs/zh/templates-architecture.md`.
 
-> **Failure handling**: If template directory doesn't contain a valid `design_spec.md`, report the invalid path and suggest listing available templates via `ls ${SKILL_DIR}/templates/layouts/`.
+> **Failure handling**: If template directory doesn't contain a valid `design_spec.md`, report the invalid path and instruct user to list available templates via `ls ${SKILL_DIR}/templates/layouts/`.
 
 **✅ Checkpoint — Default path proceeds to Step 4 automatically.**
 
@@ -309,6 +309,8 @@ Read references/strategist.md
 
 #### Eight Confirmations
 
+🔴 **CHECKPOINT**: This is the **only** place where the agent must stop and wait for user input. All other steps proceed automatically.
+
 ⛔ **BLOCKING**: Present the Eight Confirmations as a bundled recommendation set and **wait for explicit user confirmation** before outputting design spec.
 
 1. **Canvas format** — 16:9 / 4:3 / story / custom
@@ -320,9 +322,17 @@ Read references/strategist.md
 7. **Typography plan** — including formula rendering policy (mixed/render-all/text-only)
 8. **Image usage approach** — AI-generated / web-sourced / user-provided / placeholder
 
-**Split-mode note** (mandatory, appended after the eight items):
-- Heavy (long deck / bulky sources): Recommend split mode — stop this chat, open fresh window, use `继续生成 projects/<name>` for Phase B
-- Normal: Default continuous mode; can switch to split mode any time with `继续生成 projects/<name>`
+**Split-mode decision** (mandatory, after presenting Eight Confirmations):
+
+**Split condition**: If ANY of the following is true, recommend split mode:
+- Estimated page count ≥ 15
+- Source material > 20 pages (PDF/DOCX) or > 5000 words
+- Image requirement ≥ 6 images (high token cost)
+- User explicitly asks for split mode
+
+**Continuous mode**: If none of the above conditions are met, proceed continuously (Steps 5→6→7 in one chat).
+
+**Split-mode behavior**: Stop this chat. Output Phase A hand-off marker (see Step 5). User opens fresh chat → `继续生成 projects/<name>` + phase-b-resume workflow.
 
 **Formula rendering policy** (inside item 7):
 | Policy | Behavior |
@@ -343,7 +353,7 @@ After confirmation and **before outputting `design_spec.md`**, if formula policy
 
 **Checkpoint**:
 ```markdown
-## ✅ Strategist Phase Complete
+## 🔴 CHECKPOINT — Strategist Phase Gate
 - [x] Eight Confirmations completed (user confirmed)
 - [x] Design Specification & Content Outline generated
 - [x] spec_lock.md generated
@@ -384,7 +394,7 @@ Workflow:
 - [x] Each row: terminal status (no Pending remaining)
 ```
 
-**Default — auto-proceed to Step 6.** If user opted into split mode, output Phase A hand-off marker:
+**Default — auto-proceed to Step 6.** If split mode was triggered in Step 4, output Phase A hand-off marker instead:
 ```markdown
 ## ✅ Phase A Complete
 - [x] Spec: design_spec.md, spec_lock.md
@@ -544,21 +554,19 @@ Before switching roles, read the corresponding reference file. Output marker:
 
 - ❌ Do NOT combine steps 7.1/7.2/7.3 into one code block or shell invocation
 - ❌ Do NOT use `cp` as a substitute for `finalize_svg.py` — finalize does critical processing
-- ❌ Do NOT delegate SVG page generation to sub-agents
-- ❌ Do NOT batch SVG pages (5 at a time) — generate one by one
+- ❌ Do NOT delegate SVG page generation to sub-agents — the Executor phase requires the main agent's context to maintain cross-page visual continuity. Sub-agents lack upstream context and may hit tool-call limits before producing output. Generate one page at a time.
 - ❌ Do NOT pre-write SVG code during Strategist phase
 - ❌ Do NOT skip the Eight Confirmations ⛔ BLOCKING
 - ❌ Do NOT keep hardcoded personal paths, API keys, or credentials in the skill
 - ❌ Do NOT default to calling external APIs for PPT generation — this skill runs fully local
 - ❌ Do NOT use `git reset --hard` for rollback; use patch/revert
 - ❌ Do NOT write "supports everything" or "fully automatic" in user-facing descriptions — be specific
-- ❌ Do NOT let Hermes and CC skill directories drift — after any SKILL.md or workflow update, sync both sides. Run `rsync -av --exclude='.git' ~/.claude/skills/ppt-master/ ~/skills/ppt-master/` (Linux) or `cp -r` equivalent on Windows. Missing test-prompts.json, mismatched scripts, and stale README are the most common drift failures
+- ❌ Do NOT let skill directories drift — after any SKILL.md or workflow update, sync all runtime copies. Missing test-prompts.json, mismatched scripts, and stale README are the most common drift failures. **Sync command**: `rsync -av --exclude='.git' <src>/ <dst>/` (Linux/macOS) or `xcopy /E /I <src> <dst>` (Windows). Paths are runtime-dependent: Hermes `~/.hermes/skills/productivity/ppt-master/`, CC `~/.claude/skills/ppt-master/`, Codex `~/.codex/skills/ppt-master/`
 - ❌ Do NOT test `image_gen.py` with `--prompt` — it takes prompt as a positional argument, not `--prompt` flag. Correct: `python image_gen.py "your prompt" --model <model>`
 - ❌ Do NOT use `/tmp` for test projects on Windows — git-bash maps `/tmp` to `%TEMP%` (C:\Users\fzx\AppData\Local\Temp), so files disappear between calls. Always use `D:\hermes\` paths for test projects.
-- ❌ Do NOT assume assets are in the same location as scripts — `html_export.py` and other scripts resolve `skill_dir` via `Path(__file__).resolve().parent.parent` which points to `~/.hermes/skills/productivity/ppt-master/`. The D:\hermes copy is secondary and may drift. Always verify `ls ~/.hermes/skills/productivity/ppt-master/assets/` before running html_export.
-- ❌ Do NOT delegate SVG page generation to sub-agents — the Executor phase requires the main agent's context to maintain cross-page visual continuity. Sub-agents lack upstream context and may hit tool-call limits before producing output.
+- ❌ Do NOT assume assets are in the same location as scripts — `html_export.py` and other scripts resolve `skill_dir` via `Path(__file__).resolve().parent.parent`. The secondary copy (e.g. `D:\hermes\`) may drift. Always verify `ls <actual_skill_path>/assets/` before running html_export.
 - ❌ Do NOT use single-quoted strings containing `Bearer *** in Windows git-bash curl — the shell mangles nested quotes. Write payloads to a temp JSON file and use `-d @file.json` instead
-| ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
+- ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
 - ❌ Do NOT invent fake install commands in README — `npx skills add`, `/plugin marketplace add` are NOT valid commands. README Quick Start must list actual installation methods: platform-specific (Hermes built-in, CC clone, Codex clone, GitHub ZIP download)
 - ❌ Do NOT skip `validate_skill.py` before committing changes — this is the automated verification gate required by the Luban discipline
 
