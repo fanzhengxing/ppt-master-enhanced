@@ -64,7 +64,8 @@ description: >-
 | **内部分享/技术演示（不一定要.pptx）** | 主线 + 附带 `presenter-view` 工作流 | `.pptx` + HTML 演讲者视图 |
 | **已有成品，想检查视觉质量** | 主线结束后跑 `visual-quality-check` 工作流 | 质量报告 |
 | **品牌统一、多模板输出** | 主线 + `design-tokens.md` 约束求解 | 风格一致的多版本 |
-| **需要自定义动画/音乐/旁白** | 主线后跑 `customize-animations`/`generate-audio` 工作流 | `.pptx` 带动画/旁白 |
+| **需要自定义动画/音乐/旁白** | 主线后跑 `phase-b-resume` 动画定制部分 + `generate-audio` 工作流 | `.pptx` 带动画/旁白 |
+| **已有PPT，想检查/优化** | 主线 + `visual-quality-check` 工作流 | 质量报告 + 优化建议 |
 | **只想读/分析已有的.pptx** | 不要用ppt-master → 用 `powerpoint` skill | 内容提取 |
 
 对比同类工具：
@@ -103,10 +104,9 @@ ppt-master/
 │   ├── presenter-view.md       ← HTML presenter view from .pptx notes
 │   ├── template-fill-pptx.md   ← Fill existing PPTX template
 │   ├── create-template.md      ← Create new layout/brand/deck template
-│   ├── resume-execute.md       ← Split-mode execution (Phase A → B)
-│   ├── verify-charts.md        ← Chart coordinate calibration
-│   ├── customize-animations.md ← Animation tuning
-│   ├── live-preview.md         ← Browser preview during gen
+│   ├── phase-b-resume.md         ← Split-mode execution + animation customization (Phase A → B)
+│   ├── verify-charts.md          ← Chart coordinate calibration
+│   ├── live-preview.md           ← Browser preview during gen
 │   └── ...
 │
 ├── references/                 ← Role definitions & technical constraints
@@ -169,9 +169,7 @@ ppt-master/
 | Template Fill | `workflows/template-fill-pptx.md` | User has an existing PPTX template to fill |
 | Create Template | `workflows/create-template.md` | Create a new layout/brand/deck template |
 | Create Brand | `workflows/create-brand.md` | Brand-only identity preset |
-| Resume Execute | `workflows/resume-execute.md` | Split mode — resume Phase B in a fresh chat |
-| Verify Charts | `workflows/verify-charts.md` | Chart coordinate calibration after SVG gen |
-| Customize Animations | `workflows/customize-animations.md` | User wants to tune per-object animation order/effects |
+|| Phase B Resume | `workflows/phase-b-resume.md` | Split mode — resume Phase B in a fresh chat; optional animation customization included |
 | Live Preview | `workflows/live-preview.md` | Browser-based live preview during generation |
 | Visual Review | `workflows/visual-review.md` | Per-page rubric visual self-check (opt-in) |
 | **Image to PPTX** | **`workflows/image-to-pptx.md`** | **图片/截图 → 可编辑PPTX逆向还原** |
@@ -179,6 +177,33 @@ ppt-master/
 | **Presenter View** | **`workflows/presenter-view.md`** | **HTML presenter view from .pptx speaker notes (internal sharing/demo)** |
 
 > ⚡ **Topic Research** 工作流支持两档搜索：**标准模式**（快速覆盖基本信息）和 **Deep Research 模式**（多源交叉→深度抓取→结构化综合），用户说"深入了解/全面调研"时自动触发。
+
+### Workflow Selection Guide
+
+When multiple workflows match a user request, pick the **most specific one**. This guide resolves ambiguity:
+
+| User Intent | Primary Workflow | Alternative | Notes |
+|---|---|---|---|
+| "从PDF/文档生成PPT" | **主线 (Step 1-7)** | — | Standard 7-step pipeline |
+| "只有一个话题" | `topic-research` | — | Run first, then main pipeline |
+| "从截图还原PPT" | `image-to-pptx` | — | Reverse engineering |
+| "继续做PPT" | `phase-b-resume` | — | Resume after Phase A |
+| "加动画/调节奏" | `phase-b-resume` (动画定制部分) | — | Only after PPTX exists |
+| "加旁白/音乐" | `generate-audio` | — | Post-export audio |
+| "检查视觉质量" | `visual-quality-check` | `visual-review` | quality-check = contrast/layout; visual-review = rubric-based per-page |
+| "图表坐标校准" | `verify-charts` | — | Data charts only |
+| "实时预览" | `live-preview` | — | During generation |
+| "填已有PPT模板" | `template-fill-pptx` | — | Template-based |
+| "建品牌/模板" | `create-brand` / `create-template` | — | Branding first, then template |
+| "读/分析.pptx" | **不要 ppt-master** | `powerpoint` skill | Read-only |
+| "HTML演示" | `presenter-view` | — | Internal sharing/demo |
+
+**Priority rules:**
+1. If user mentions an existing PPTX → `template-fill-pptx` or `image-to-pptx`
+2. If user says "继续" → `phase-b-resume`
+3. If user says "动画" → `phase-b-resume` (animation customization part)
+4. If user says "检查" or "质量" → `visual-quality-check` first; `visual-review` only if they said "深度检查" or "逐项评审"
+5. Default → main pipeline (Step 1-7)
 
 ---
 
@@ -364,7 +389,7 @@ Workflow:
 ## ✅ Phase A Complete
 - [x] Spec: design_spec.md, spec_lock.md
 - [x] Resources: sources/, images/, templates/
-- [ ] **Next**: Open fresh chat → `继续生成 projects/<name>` + resume-execute workflow
+- [ ] **Next**: Open fresh chat → `继续生成 projects/<name>` + phase-b-resume workflow
 ```
 
 ---
