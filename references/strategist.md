@@ -34,6 +34,26 @@ Recommend format based on scenario (see [`canvas-formats.md`](canvas-formats.md)
 
 Provide specific page count recommendation based on source document content volume.
 
+### b.5 Mirror Template Priority (Speed Optimization)
+
+When the source material has a clear visual reference (existing PPT, brand deck, competitor deck), **strongly recommend mirror-mode templates** over free-design templates. Mirror mode is 2-3x faster because:
+
+1. Executor copies the mirror SVG as-is, only edits text in-place
+2. No need to hand-write SVG layout, positioning, colors
+3. Visual quality is guaranteed by the source deck's professional design
+
+**When to recommend mirror mode**:
+- User provides an existing PPT file or screenshot
+- User has a brand template they want to replicate
+- Source material is a structured document (report, proposal, briefing)
+
+**When NOT to recommend mirror mode**:
+- Creative/promotional deck where visual novelty is the goal
+- Source material has no clear visual reference
+- Content requires non-standard layouts not available in mirror templates
+
+**Implementation**: When mirror mode is recommended, Strategist reads the mirror template's `design_spec.md §V Page Roster` and maps each project page to the closest mirror reference. The mapping goes into `spec_lock.md page_layouts`.
+
 ### c. Key Information Confirmation
 
 Confirm target audience, usage occasion, and core message; provide initial assessment based on document nature.
@@ -289,7 +309,7 @@ The script renders PNGs into `images/`, trying `codecogs`, `quicklatex`, `mathpa
 
 | Mode | Trigger | Mechanism |
 |---|---|---|
-| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 |
+| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 with mixed `ai` + `web` manifest — single `--manifest` call dispatches both AI and web requests in one pool |
 | **Path B** | `IMAGE_BACKEND` not configured AND host has a native image tool (Codex / Antigravity / Claude Code / similar) — auto-selected, no user prompting needed | Host-native generation |
 | **Offline Manual** | `IMAGE_BACKEND` not configured AND host has no native image tool | Prompts written to `images/image_prompts.json`; user generates externally and places files in `project/images/` |
 
@@ -561,7 +581,7 @@ Side-by-side only: container ratio must match image ratio. Hero / atmosphere / a
 
 > **Multi-image slides**: When multiple images appear on one page, use the grid formulas in the "Multi-Image Layout" section of `references/image-layout-spec.md`.
 
-> **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
+> **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. **Both `ai` and `web` rows are dispatched in a single `--manifest` call** with mixed concurrency pool. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
 
 ### Template Match — Visualization + Structural Patterns (Non-blocking — Strategist recommends, no user confirmation needed)
 
@@ -747,6 +767,7 @@ Templates are starting points. The Strategist may adjust based on content and au
    - **Rhythm follows narrative, not quota**: `breathing` pages mark natural pauses — chapter transitions, standalone emphasis (hero quote / big number), SCQA bridges. Dense decks may legitimately be all `dense`. **Do NOT invent filler pages** ("Thank you", empty dividers) to pad rhythm — every `breathing` page must say something independent.
    - **page_layouts (write only when a template is in use)**: For each page that inherits a template SVG, add `P<NN>: <svg_basename>` (e.g., `P04: 03a_content_image_text`). Pages designed freely get **no entry** — Executor reads the absence as "free design, no inheritance". If zero pages use a template, omit the section entirely.
    - **page_charts (write only for chart pages that match a catalog template)**: For each page in `design_spec.md §VII` whose `reference template path` points to `templates/charts/<name>.svg`, add `P<NN>: <chart_name>`. Pages with `no-template-match` in §VII MUST NOT appear here (Executor would look for a non-existent reference). If the deck has no data-visualization pages, omit the section.
+5. **Generate spec_lock_minimal.md**: run `python3 scripts/spec_lock_minimal.py <project_path>` to produce a trimmed version of spec_lock.md containing only Executor-required fields (canvas, colors, typography, icons, images, page_rhythm, page_layouts, page_charts, forbidden) — no blockquotes, no design narrative. This reduces per-page token consumption by ~60-80%. If the script is unavailable, manually produce the minimal file following the template in `references/spec-lock-minimal.md`.
    - **Hard rule**: Use both `page_layouts` and `page_charts` for the same page only when the layout template is a compatible shell for the chart. Do not pair chart pages with conflicting page layouts (e.g., `waterfall_chart` + timeline layout, KPI cards + circle-diagram layout). If no compatible layout exists, omit the page from `page_layouts`.
 
 ---

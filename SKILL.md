@@ -178,6 +178,8 @@ ppt-master/
 
 > ⚡ **Topic Research** 工作流支持两档搜索：**标准模式**（快速覆盖基本信息）和 **Deep Research 模式**（多源交叉→深度抓取→结构化综合），用户说"深入了解/全面调研"时自动触发。
 
+> ⚡ **Speed Optimization**: P0 optimizations implemented in v1.0.1 — `spec_lock_minimal.md` (60-80% per-page token reduction), mirror-mode template priority (2-3x SVG speedup). See `references/speed-analysis.md` for details.
+
 ### Workflow Selection Guide
 
 When multiple workflows match a user request, pick the **most specific one**. This guide resolves ambiguity:
@@ -268,6 +270,8 @@ Import source content:
 
 **Default — free design.** Proceed directly to Step 4. Do NOT query any `*_index.json` unless triggered. Do NOT ask the user. Do NOT proactively suggest templates.
 
+**Mirror mode priority**: If the user provides an existing PPT file, brand template, or screenshot for reverse engineering, strongly prefer mirror-mode templates (templates with `replication_mode: mirror` in `design_spec.md` frontmatter). Mirror mode is 2-3x faster because Executor copies the mirror SVG and only edits text in-place. See `references/executor-base.md §1.1` for mirror-mode details.
+
 **Template flow triggers ONLY on explicit directory paths** from the user's initial message. A bare name without a resolvable directory path does not trigger.
 
 | User input contains | Step 3 action |
@@ -350,6 +354,7 @@ After confirmation and **before outputting `design_spec.md`**, if formula policy
 **Output**:
 - `<project_path>/design_spec.md` — Human-readable design narrative
 - `<project_path>/spec_lock.md` — Machine-readable execution contract
+- `<project_path>/spec_lock_minimal.md` — Trimmed execution lock (run `python3 ${SKILL_DIR}/scripts/spec_lock_minimal.py <project_path>` after spec_lock.md is written). Reduces per-page Executor token consumption by 60-80%.
 
 **Checkpoint**:
 ```markdown
@@ -427,7 +432,7 @@ python3 ${SKILL_DIR}/scripts/svg_editor/server.py <project_path> --live
 
 **Pre-generation Batch Read**: Before the first SVG, batch-read every distinct layout SVG in `spec_lock.page_layouts` and chart SVG in `spec_lock.page_charts`. One read per file, up front.
 
-**Per-page spec_lock re-read**: Before **each** SVG page, `read_file <project_path>/spec_lock.md`. Colors/fonts/icons/images from this file only. Also read `page_rhythm` / `page_layouts` / `page_charts` for that page.
+**Per-page spec_lock re-read**: Before **each** SVG page, `read_file <project_path>/spec_lock_minimal.md` (preferred) or `read_file <project_path>/spec_lock.md` (fallback if minimal not found). Colors/fonts/icons/images from this file only. Also read `page_rhythm` / `page_layouts` / `page_charts` for that page.
 
 **Visual Construction**: Generate SVG pages sequentially, one at a time → `<project_path>/svg_output/`.
 
@@ -538,6 +543,9 @@ Before switching roles, read the corresponding reference file. Output marker:
 | Animations | `references/animations.md` |
 | Design Tokens | `references/design-tokens.md` | 设计系统Token抽象层（L0/L1/L2） |
 | Gap Analysis vs Competitors | `references/gap-analysis.md` | PPTAgent/Gorden/html-ppt/huashu/OpenDesign/guizang 对标 |
+| Speed Analysis | `references/speed-analysis.md` | 生成速度瓶颈分析：竞品对比、优化方案排序、基准测试方法 |
+| Spec Lock Minimal | `references/spec-lock-minimal.md` | 精简版执行锁模板 — 只含Executor需要的运行时字段，减少60-80% token消耗 |
+| Spec Lock Minimal Script | `scripts/spec_lock_minimal.py` | 从 spec_lock.md 自动生成 spec_lock_minimal.md — 删除blockquote、长注释行，保留canvas/colors/typography/icons/images/page_rhythm/page_layouts/page_charts/forbidden |
 | Agnes AI Provider | `references/agnes-ai-image-provider.md` | 免费Agnes图片/视频生成API配置 |
 | Design innovation (from WeChat article) | `references/design-innovation.md` | 海洋创意设计: visual storytelling, emotional design, cultural integration |
 | Verified pipeline | `references/verified-pipeline.md` |
@@ -547,6 +555,7 @@ Before switching roles, read the corresponding reference file. Output marker:
 | html-export resource inlining | `references/html-export-resource-inlining.md` | HTML导出资源内联修复记录：从外部引用改为内联CSS/JS的完整方案和坑位 |
 | README showcase pattern | `references/readme-showcase-pattern.md` | README嵌入截图展示效果的最佳实践，含生成、嵌入、同步检查清单 |
 | README maintenance | `references/readme-maintenance.md` | README维护规范：安装指令必须准确、跨平台同步、禁止伪造命令 |
+| Speed Analysis | `references/speed-analysis.md` | 生成速度瓶颈分析：竞品对比（Gorden/PPTAgent/html-ppt/huashu）、优化方案排序（spec_lock精简/Mirror模式优先/图片并行/SVG骨架/异步化）、基准测试方法 |
 
 ---
 
@@ -561,7 +570,7 @@ Before switching roles, read the corresponding reference file. Output marker:
 - ❌ Do NOT default to calling external APIs for PPT generation — this skill runs fully local
 - ❌ Do NOT use `git reset --hard` for rollback; use patch/revert
 - ❌ Do NOT write "supports everything" or "fully automatic" in user-facing descriptions — be specific
-- ❌ Do NOT let skill directories drift — after any SKILL.md or workflow update, sync all runtime copies. Missing test-prompts.json, mismatched scripts, and stale README are the most common drift failures. **Sync command**: `rsync -av --exclude='.git' <src>/ <dst>/` (Linux/macOS) or `xcopy /E /I <src> <dst>` (Windows). Paths are runtime-dependent: Hermes `~/.hermes/skills/productivity/ppt-master/`, CC `~/.claude/skills/ppt-master/`, Codex `~/.codex/skills/ppt-master/`
+- ❌ Do NOT let skill directories drift — after any SKILL.md or workflow update, sync all runtime copies. Missing test-prompts.json, mismatched scripts, and stale README are the most common drift failures. **Sync command**: `rsync -av --exclude='.git' <src>/ <dst>/` (Linux/macOS) or `xcopy /E /I <src> <dst>` (Windows). Paths are runtime-dependent: Hermes `~/.hermes/skills/productivity/ppt-master/`, CC `~/.claude/skills/ppt-master/`, Codex `~/.codex/skills/ppt-master/`. **Note**: Windows terminal is denied during skill review — use `write_file` with SKILL.md content to sync to CC when terminal is unavailable.
 - ❌ Do NOT test `image_gen.py` with `--prompt` — it takes prompt as a positional argument, not `--prompt` flag. Correct: `python image_gen.py "your prompt" --model <model>`
 - ❌ Do NOT use `/tmp` for test projects on Windows — git-bash maps `/tmp` to `%TEMP%` (C:\Users\fzx\AppData\Local\Temp), so files disappear between calls. Always use `D:\hermes\` paths for test projects.
 - ❌ Do NOT assume assets are in the same location as scripts — `html_export.py` and other scripts resolve `skill_dir` via `Path(__file__).resolve().parent.parent`. The secondary copy (e.g. `D:\hermes\`) may drift. Always verify `ls <actual_skill_path>/assets/` before running html_export.
@@ -569,6 +578,7 @@ Before switching roles, read the corresponding reference file. Output marker:
 - ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
 - ❌ Do NOT invent fake install commands in README — `npx skills add`, `/plugin marketplace add` are NOT valid commands. README Quick Start must list actual installation methods: platform-specific (Hermes built-in, CC clone, Codex clone, GitHub ZIP download)
 - ❌ Do NOT skip `validate_skill.py` before committing changes — this is the automated verification gate required by the Luban discipline
+- ❌ Do NOT use full spec_lock.md for per-page re-read when spec_lock_minimal.md exists — always prefer the minimal version for Executor page generation to save 60-80% token cost
 
 ## 🔍 Failure Modes & Troubleshooting
 

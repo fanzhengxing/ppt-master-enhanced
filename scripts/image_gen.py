@@ -340,7 +340,7 @@ def _resolve_backend() -> tuple[object, str]:
     sys.exit(1)
 
 
-DEFAULT_MANIFEST_CONCURRENCY = 3
+DEFAULT_MANIFEST_CONCURRENCY = 5
 
 STATUS_PENDING = "Pending"
 STATUS_GENERATED = "Generated"
@@ -674,7 +674,7 @@ def main() -> None:
         "--concurrency", type=int, default=None,
         help=(
             "Max concurrent requests in --manifest mode. Defaults to "
-            f"IMAGE_CONCURRENCY env or {DEFAULT_MANIFEST_CONCURRENCY}. "
+            "IMAGE_CONCURRENCY env or 5. "
             "Auto-halves on rate-limit; 1 is the serial fallback."
         ),
     )

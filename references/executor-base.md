@@ -87,7 +87,9 @@ Before the first SVG page, output a confirmation listing: canvas dimensions, bod
 
 > Long decks drift off the declared palette/icons mid-deck due to context compression. `spec_lock.md` is the canonical execution reference — re-read it per page to bypass model memory.
 
-**Hard rule**: Before generating **each** SVG page, `read_file <project_path>/spec_lock.md`. Use only values from this file, not from memory. If context was auto-compacted, also `read_file <project_path>/design_spec.md` for the current page's §IX brief.
+**Hard rule**: Before generating **each** SVG page, `read_file <project_path>/spec_lock_minimal.md` (preferred) or `read_file <project_path>/spec_lock.md` (fallback). Use only values from this file, not from memory. If context was auto-compacted, also `read_file <project_path>/design_spec.md` for the current page's §IX brief.
+
+**Performance note**: `spec_lock_minimal.md` is a trimmed version of `spec_lock.md` containing only Executor-required fields (canvas, colors, typography, icons, images, page_rhythm, page_layouts, page_charts, forbidden) — no blockquotes, no design narrative. It reduces per-page token consumption by ~60-80%. If the minimal file is missing (legacy project), fall back to reading the full `spec_lock.md`.
 
 **Per-block expression**: render each `design_spec.md §IX Content` block in its written texture — a full-sentence block as wrapped prose, a fragment/label block as bullets/keywords. **Never split a full-sentence block into a bullet list** — not because a bullet lays out easier, and not because an inherited template slot is shaped as a list. If a block carries no clear texture, infer the mode from its wording and the page layout.
 
