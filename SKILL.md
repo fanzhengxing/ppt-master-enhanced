@@ -511,6 +511,7 @@ Before switching roles, read the corresponding reference file. Output marker:
 | html-export verification | `references/html-export-verification.md` | html_export.py 端到端验证记录、已知坑位、Windows 路径注意事项 |
 | html-export resource inlining | `references/html-export-resource-inlining.md` | HTML导出资源内联修复记录：从外部引用改为内联CSS/JS的完整方案和坑位 |
 | README showcase pattern | `references/readme-showcase-pattern.md` | README嵌入截图展示效果的最佳实践，含生成、嵌入、同步检查清单 |
+| README maintenance | `references/readme-maintenance.md` | README维护规范：安装指令必须准确、跨平台同步、禁止伪造命令 |
 
 ---
 
@@ -533,6 +534,7 @@ Before switching roles, read the corresponding reference file. Output marker:
 - ❌ Do NOT delegate SVG page generation to sub-agents — the Executor phase requires the main agent's context to maintain cross-page visual continuity. Sub-agents lack upstream context and may hit tool-call limits before producing output.
 - ❌ Do NOT use single-quoted strings containing `Bearer *** in Windows git-bash curl — the shell mangles nested quotes. Write payloads to a temp JSON file and use `-d @file.json` instead
 - ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
+- ❌ Do NOT invent fake install commands in README — `npx skills add`, `/plugin marketplace add` are NOT valid commands. README Quick Start must list actual installation methods: platform-specific (Hermes built-in, CC clone, Codex clone, GitHub ZIP download)
 
 ## 🔒 Security & Safety
 

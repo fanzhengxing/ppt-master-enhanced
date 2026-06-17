@@ -1,4 +1,16 @@
 __pycache__/
 *.pyc
 .env
+
+# 生成产物
 projects/
+exports/
+
+# 图标库（11632个文件，太大，按需从原始ppt-master获取）
+templates/icons/
+
+# 压缩包
+*.zip
+
+# 截图素材（README引用但无需git追踪）
+assets/showcase/*.png
