@@ -533,8 +533,44 @@ Before switching roles, read the corresponding reference file. Output marker:
 - ❌ Do NOT assume assets are in the same location as scripts — `html_export.py` and other scripts resolve `skill_dir` via `Path(__file__).resolve().parent.parent` which points to `~/.hermes/skills/productivity/ppt-master/`. The D:\hermes copy is secondary and may drift. Always verify `ls ~/.hermes/skills/productivity/ppt-master/assets/` before running html_export.
 - ❌ Do NOT delegate SVG page generation to sub-agents — the Executor phase requires the main agent's context to maintain cross-page visual continuity. Sub-agents lack upstream context and may hit tool-call limits before producing output.
 - ❌ Do NOT use single-quoted strings containing `Bearer *** in Windows git-bash curl — the shell mangles nested quotes. Write payloads to a temp JSON file and use `-d @file.json` instead
-- ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
+| ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
 - ❌ Do NOT invent fake install commands in README — `npx skills add`, `/plugin marketplace add` are NOT valid commands. README Quick Start must list actual installation methods: platform-specific (Hermes built-in, CC clone, Codex clone, GitHub ZIP download)
+- ❌ Do NOT skip `validate_skill.py` before committing changes — this is the automated verification gate required by the Luban discipline
+
+## 🔍 Failure Modes & Troubleshooting
+
+### Installation Failures
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `pip install` fails with permission error | No admin/write access | Use `--user` flag or virtualenv: `python -m venv .venv && source .venv/bin/activate` |
+| `pip install` fails with wheel build error | Missing compiler (e.g., lxml, pillow) | Install system deps first: `apt-get install gcc libxml2-dev libxslt-dev` (Linux) or `brew install libxml2` (macOS) |
+| `officecli` not found | Not in PATH | Run `where officecli.exe` (Windows) or `which officecli` (Linux/macOS). If not found, install per platform docs |
+| `python3` not found on Windows | python.org installer uses `python` | Use `python` instead of `python3`. Or add to PATH: `setx PATH "%PATH%;C:\Python311"` |
+| PowerShell execution policy blocked | Windows default policy | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` in PowerShell as admin |
+
+### Runtime Failures
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `svg_quality_checker.py` reports spec_lock drift | Template auxiliary colors not in spec_lock | Safe to ignore — best practice: add `light_bg`, `muted`, `subtitle`, `footer`, `white` to spec_lock colors |
+| `svg_quality_checker.py` reports forbidden elements | SVG contains `<foreignObject>`, `rgba()`, `<style>` tags | Remove forbidden elements from SVG source or regenerate with cleaner SVG |
+| PPTX export produces blank pages | Missing image files in `images/` directory | Verify files exist before Step 7: `ls <project>/images/`. Missing images → broken references in PPTX |
+| PPTX export fails with XML error | Corrupted SVG or malformed DrawingML | Check `svg_output/` for malformed SVG. Run `finalize_svg.py` again before re-export |
+| Chinese characters show as boxes | Target machine lacks CJK fonts | Ensure Microsoft YaHei, SimSun, or Noto Sans CJK is installed on target machine |
+| `image_gen.py` returns 400 from Agnes | `response_format` param not supported | Call Agnes API directly via `requests.post()` with only `model`/`prompt`/`n`/`size` — skip `response_format` |
+| `image_gen.py` key handling fails | Shell `$` expansion corrupts API key | NEVER write key in bash heredoc. Use Python `open().read()` from `.env` file. Use single-quoted heredoc: `python3 << 'PYEOF'` |
+
+### What NOT to Use ppt-master For
+
+| Scenario | Better Alternative | Why |
+|----------|-------------------|-----|
+| 3-5 page simple PPT | OfficeCLI standalone flow | ppt-master overhead (8 confirmations, SVG pipeline) is overkill for tiny decks |
+| Need AI-generated images IN the PPT | Run ppt-master first, then Agnes API for images | ppt-master generates layout/shapes, not photographic images |
+| Real-time collaborative editing | Generate PPTX → use PowerPoint Online | ppt-master is a one-shot generator, not a collaboration tool |
+| Just read/analyze existing .pptx | Use `powerpoint` skill | ppt-master is for generation, not analysis |
+| Batch generate hundreds of PPTs | Write a wrapper script around this skill | This skill is designed for one-off, high-quality output, not bulk automation |
+| Need PDF output | Generate PPTX first, then convert | ppt-master outputs native PPTX. PDF conversion is a separate step |
 
 ## 🔒 Security & Safety
 
