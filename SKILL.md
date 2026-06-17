@@ -1,13 +1,18 @@
 ---
 name: ppt-master
 description: >-
-  AI-driven PPT generation — converts PDF/DOCX/Markdown/URL/text topic into native editable
-  .pptx presentations. SVG→DrawingML pipeline (ppt-master-enhanced).
-  Multi-role collaboration: Strategist (content planning) → Executor (SVG authoring)
-  → Post-processing (native PPTX export). Works on Hermes, Claude Code, Codex,
-  OpenClaw, and any skill-compatible runtime.
+  AI-driven PPT generation — converts PDF/DOCX/Markdown/URL/text topic into
+  native editable .pptx presentations. SVG→DrawingML pipeline (ppt-master-enhanced).
+  13+ workflows cover 11+ scenes: topic research (standard + deep Research),
+  image→PPTX reverse engineering (4-layer decompose), visual quality check,
+  presenter view HTML, template fill, brand presets, chart verification,
+  custom animations, live preview, six-step PPT methodology. Design Token layer (L0/L1/L2) for
+  brand-consistent multi-template output. Gap analysis vs PPTAgent/Gorden/
+  html-ppt/huashu/OpenDesign/guizang documented.
+  Works cross-agent: Hermes, Claude Code, Codex, OpenClaw.
+  GitHub: https://github.com/fanzhengxing/ppt-master-enhanced
   Trigger: "create PPT", "make presentation", "生成PPT", "做PPT", "制作演示文稿",
-  "做个PPT", "ppt-master".
+  "做个PPT", "ppt-master", "ppt-master-enhanced".
   Do NOT use for: quick text→pptx without layout needs (use officecli-pptx instead),
   reading/analyzing existing .pptx content (use the powerpoint skill instead).
 ---
@@ -17,30 +22,6 @@ description: >-
 > 🎯 **把文档扔进来，拿走一个真正的、精美的、可编辑的 PowerPoint。**  
 > 本地执行，不依赖任何外部 API。SVG→DrawingML 管线，原生形状、动画、演讲备注全保留。  
 > 在 Hermes、Claude Code、Codex、OpenClaw 等 skill-compatible runtime 上均可运行。
-
-## 🎯 场景选择指南 — 该走哪条路？
-
-| 你的场景 | 推荐路线 | 输出 |
-|---------|---------|------|
-| **从文字/文档做正式PPT** | 主线：Step1→Step7（标准7步） | `.pptx` |
-| **只有一个话题，没素材** | 先跑 `topic-research` 工作流（标准/深度两档）→ 再进主线 | `.pptx` |
-| **有PPT/海报截图，想还原成可编辑PPTX** | 跑 `image-to-pptx` 工作流 | `.pptx` |
-| **需要批量生成固定格式的报告** | 主线 + brand/layout模板锁定 | `.pptx` |
-| **内部分享/技术演示（不一定要.pptx）** | 主线 + 附带 `presenter-view` 工作流 | `.pptx` + HTML演讲者视图 |
-| **已有成品，想检查视觉质量** | 主线结束后跑 `visual-quality-check` 工作流 | 质量报告 |
-| **品牌统一、多模板输出** | 主线 + `design-tokens.md` 约束求解 | 风格一致的多版本 |
-| **已有.d2/架构图要嵌入PPT** | 主线中 SVG渲染阶段嵌入 | `.pptx`+图表 |
-| **需要自定义动画/音乐/旁白** | 主线后跑 `customize-animations`/`generate-audio` 工作流 | `.pptx` 带动画/旁白 |
-| **只想读/分析已有的.pptx** | 不要用ppt-master → 用 `powerpoint` skill | 内容提取 |
-
-对比同类工具：
-| 场景 | 用别人的？ | 用我们的？ |
-|------|-----------|-----------|
-| 纯HTML演示（多人在线分享） | **html-ppt-skill** | ppt-master做.pptx + presenter-view做HTML |
-| 文档→多格式（含PDF） | **huashu-slides** | ppt-master（.pptx为主，未来加PDF输出） |
-| 设计系统化/本地部署 | **Open Design** | ppt-master + design-tokens.md |
-| 视觉质量优化 | **guizang-ppt-skill** | ppt-master + visual-quality-check工作流 |
-| 批量自动化生成 | — | **ppt-master 主打路线** |
 
 **Core Pipeline**: `Source → Init Project → [Template] → Strategist → [Images] → Executor (SVG) → Quality Check → Post-process → PPTX`
 
@@ -72,6 +53,30 @@ description: >-
 > - On Claude Code: `${SKILL_DIR}` = skill directory under `~/.claude/skills/ppt-master/`
 > - On Windows: use `python` instead of `python3` if `python3` not found
 
+## 🎯 场景选择指南 — 该走哪条路？
+
+| 你的场景 | 推荐路线 | 输出 |
+|---------|---------|------|
+| **从文字/文档做正式PPT** | 主线：Step1→Step7（标准7步） | `.pptx` |
+| **只有一个话题，没素材** | 先跑 `topic-research` 工作流（标准/深度两档）→ 再进主线 | `.pptx` |
+| **有PPT/海报截图，想还原成可编辑PPTX** | 跑 `image-to-pptx` 工作流 | `.pptx` |
+| **需要批量生成固定格式的报告** | 主线 + brand/layout模板锁定 | `.pptx` |
+| **内部分享/技术演示（不一定要.pptx）** | 主线 + 附带 `presenter-view` 工作流 | `.pptx` + HTML 演讲者视图 |
+| **已有成品，想检查视觉质量** | 主线结束后跑 `visual-quality-check` 工作流 | 质量报告 |
+| **品牌统一、多模板输出** | 主线 + `design-tokens.md` 约束求解 | 风格一致的多版本 |
+| **需要自定义动画/音乐/旁白** | 主线后跑 `phase-b-resume` 动画定制部分 + `generate-audio` 工作流 | `.pptx` 带动画/旁白 |
+| **已有PPT，想检查/优化** | 主线 + `visual-quality-check` 工作流 | 质量报告 + 优化建议 |
+| **只想读/分析已有的.pptx** | 不要用ppt-master → 用 `powerpoint` skill | 内容提取 |
+
+对比同类工具：
+| 场景 | 用别人的？ | 用我们的？ |
+|------|-----------|-----------|
+| 纯HTML演示（多人在线分享） | **html-ppt-skill** | ppt-master做.pptx + presenter-view做HTML |
+| 文档→多格式（含PDF） | **huashu-slides** | ppt-master（.pptx为主，未来加PDF输出） |
+| 设计系统化/本地部署 | **Open Design** | ppt-master + design-tokens.md |
+| 视觉质量优化 | **guizang-ppt-skill** | ppt-master + visual-quality-check工作流 |
+| 批量自动化生成 | — | **ppt-master 主打路线** |
+
 ## Directory Structure
 
 ```
@@ -89,26 +94,25 @@ ppt-master/
 │   ├── finalize_svg.py         ← Post-processing
 │   ├── image_gen.py            ← AI image generation
 │   ├── image_search.py         ← Web image search
-│   ├── ...                     ← 28+ more (see scripts/ directory)
+│   ├── compose_pptx.py         ← Image→PPTX: 4-layer→editable PPTX (B7)
+│   ├── ...                     ← 30+ more (see scripts/ directory)
 │
-├── workflows/                  ← 13 standalone workflows
+├── workflows/                  ← 14 standalone workflows
 │   ├── topic-research.md       ← Web research (standard + Deep Research)
+│   ├── image-to-pptx.md        ← Image/screenshot → editable PPTX
+│   ├── visual-quality-check.md ← Post-SVG visual quality inspection
+│   ├── presenter-view.md       ← HTML presenter view from .pptx notes
 │   ├── template-fill-pptx.md   ← Fill existing PPTX template
 │   ├── create-template.md      ← Create new layout/brand/deck template
-│   ├── resume-execute.md       ← Split-mode execution (Phase A → B)
-│   ├── verify-charts.md        ← Chart coordinate calibration
-│   ├── customize-animations.md ← Animation tuning
-│   ├── live-preview.md         ← Browser preview during gen
-│   ├── visual-quality-check.md ← Visual quality inspection
-│   ├── presenter-view.md       ← HTML presenter view
-│   ├── visual-review.md        ← Per-page rubric check
-│   ├── generate-audio.md       ← Voiceover generation
-│   ├── create-brand.md         ← Brand-only identity preset
-│   └── image-to-pptx.md        ← Image/screenshot → editable PPTX
+│   ├── phase-b-resume.md         ← Split-mode execution + animation customization (Phase A → B)
+│   ├── verify-charts.md          ← Chart coordinate calibration
+│   ├── live-preview.md           ← Browser preview during gen
+│   └── ...
 │
 ├── references/                 ← Role definitions & technical constraints
 │   ├── strategist.md, executor-base.md, shared-standards.md
 │   ├── canvas-formats.md, image-layout-patterns.md
+│   ├── design-tokens.md        ← Design system Token layer (L0/L1/L2)
 │   └── verified-pipeline.md    ← Pipeline verification record
 │
 ├── templates/                  ← Layouts, brands, decks, charts
@@ -138,8 +142,12 @@ ppt-master/
 | `${SKILL_DIR}/scripts/svg_quality_checker.py` | SVG quality check |
 | `${SKILL_DIR}/scripts/total_md_split.py` | Speaker notes splitting |
 | `${SKILL_DIR}/scripts/finalize_svg.py` | SVG post-processing (unified entry) |
+| `${SKILL_DIR}/scripts/compose_pptx.py` | **图片→PPTX逆向还原**：四层(layout.json)→可编辑PPTX合成 |
 | `${SKILL_DIR}/scripts/svg_to_pptx.py` | SVG → native PPTX export |
+| `${SKILL_DIR}/scripts/html_export.py` | SVG + notes → interactive HTML deck (presenter mode, themes, animations) |
 | `${SKILL_DIR}/scripts/update_spec.py` | Propagate spec_lock color/font changes across SVGs |
+
+> **Image Backend**: All backends configured via `.env.example` — `IMAGE_BACKEND=openai` + `OPENAI_API_KEY` + `OPENAI_IMAGE_MODEL`. Run `python3 ${SKILL_DIR}/scripts/image_gen.py --list-backends` for all 16+ providers (gemini, openai, minimax, stability, bfl/FLUX, ideogram, qwen, zhipu, volcengine, modelscope, siliconflow, fal, replicate, openrouter, etc.). Video generation also reads from the same env config.
 
 > **Windows note**: if `python3` fails (common on python.org installs), use `python`.
 
@@ -160,16 +168,46 @@ ppt-master/
 | Template Fill | `workflows/template-fill-pptx.md` | User has an existing PPTX template to fill |
 | Create Template | `workflows/create-template.md` | Create a new layout/brand/deck template |
 | Create Brand | `workflows/create-brand.md` | Brand-only identity preset |
-| Resume Execute | `workflows/resume-execute.md` | Split mode — resume Phase B in a fresh chat |
-| Verify Charts | `workflows/verify-charts.md` | Chart coordinate calibration after SVG gen |
-| Customize Animations | `workflows/customize-animations.md` | User wants to tune per-object animation order/effects |
+| Phase B Resume | `workflows/phase-b-resume.md` | Split mode — resume Phase B in a fresh chat; optional animation customization included |
 | Live Preview | `workflows/live-preview.md` | Browser-based live preview during generation |
-| Visual Review | `workflows/visual-review.md` | Per-page rubric visual self-check (opt-in) |
-| **Image to PPTX** | **`workflows/image-to-pptx.md`** | **图片/截图 → 可编辑PPTX逆向还原** |
-| **Visual Quality Check** | **`workflows/visual-quality-check.md`** | **视觉质量检查（对比度/留白/对齐/层级）** |
-| **Presenter View** | **`workflows/presenter-view.md`** | **演讲者视图HTML生成（内部分享/演示用）** |
+| Visual Quality Check | `workflows/visual-quality-check.md` | Post-SVG quality inspection — script + AI scan for contrast/whitespace/alignment |
+| Visual Review | `workflows/visual-review.md` | Per-page rubric visual self-check (opt-in, deep review) |
+| Image to PPTX | `workflows/image-to-pptx.md` | 图片/截图 → 可编辑PPTX逆向还原 |
+| Presenter View | `workflows/presenter-view.md` | HTML self-contained deck from project assets (internal sharing/demo) |
+| Six-Step PPT Methodology | `workflows/six-step-ppt-methodology.md` | 六步法内容增强层 — 顾问→设计师→叙述师→视觉→内容→编辑，提升叙事质量 |
 
 > ⚡ **Topic Research** 工作流支持两档搜索：**标准模式**（快速覆盖基本信息）和 **Deep Research 模式**（多源交叉→深度抓取→结构化综合），用户说"深入了解/全面调研"时自动触发。
+
+> ⚡ **Speed Optimization**: P0 optimizations implemented in v1.0.1 — `spec_lock_minimal.md` (60-80% per-page token reduction), mirror-mode template priority (2-3x SVG speedup). See `references/speed-analysis.md` for details.
+
+### Workflow Selection Guide
+
+When multiple workflows match a user request, pick the **most specific one**. This guide resolves ambiguity:
+
+| User Intent | Primary Workflow | Alternative | Notes |
+|---|---|---|---|
+| "从PDF/文档生成PPT" | **主线 (Step 1-7)** | — | Standard 7-step pipeline |
+| "只有一个话题" | `topic-research` | — | Run first, then main pipeline |
+| "从截图还原PPT" | `image-to-pptx` | — | Reverse engineering |
+| "继续做PPT" | `phase-b-resume` | — | Resume after Phase A |
+| "加动画/调节奏" | `phase-b-resume` (动画定制部分) | — | Only after PPTX exists |
+| "加旁白/音乐" | `generate-audio` | — | Post-export audio |
+| "检查视觉质量" | `visual-quality-check` | `visual-review` | quality-check = script + AI scan (contrast/layout); visual-review = deep rubric per-page |
+| "图表坐标校准" | `verify-charts` | — | Data charts only |
+| "实时预览" | `live-preview` | — | During generation |
+| "填已有PPT模板" | `template-fill-pptx` | — | Template-based |
+| "建品牌/模板" | `create-brand` / `create-template` | — | Branding first, then template |
+| "读/分析.pptx" | **不要 ppt-master** | `powerpoint` skill | Read-only |
+| "HTML演示" | `presenter-view` | — | Internal sharing/demo, offline-ready |
+| "提升内容质量/叙事" | `six-step-ppt-methodology` | — | 内容增强层，叠加在Step 4之上 |
+
+**Priority rules:**
+1. If user mentions an existing PPTX → `template-fill-pptx` or `image-to-pptx`
+2. If user says "继续" → `phase-b-resume`
+3. If user says "动画" → `phase-b-resume` (animation customization part)
+4. If user says "检查" or "质量" → `visual-quality-check` first; `visual-review` only if they said "深度检查" or "逐项评审"
+5. If user says "提升叙事" / "内容质量" / "故事线" → `six-step-ppt-methodology`
+6. Default → main pipeline (Step 1-7)
 
 ---
 
@@ -234,6 +272,8 @@ Import source content:
 
 **Default — free design.** Proceed directly to Step 4. Do NOT query any `*_index.json` unless triggered. Do NOT ask the user. Do NOT proactively suggest templates.
 
+**Mirror mode priority**: If the user provides an existing PPT file, brand template, or screenshot for reverse engineering, strongly prefer mirror-mode templates (templates with `replication_mode: mirror` in `design_spec.md` frontmatter). Mirror mode is 2-3x faster because Executor copies the mirror SVG and only edits text in-place. See `references/executor-base.md §1.1` for mirror-mode details.
+
 **Template flow triggers ONLY on explicit directory paths** from the user's initial message. A bare name without a resolvable directory path does not trigger.
 
 | User input contains | Step 3 action |
@@ -256,7 +296,7 @@ Import source content:
 
 **Multi-path fusion** (different kinds): Fuse segments by priority — brand wins identity, layout wins structure, deck fills middle. See full fusion matrix in `docs/zh/templates-architecture.md`.
 
-> **Failure handling**: If template directory doesn't contain a valid `design_spec.md`, report the invalid path and suggest listing available templates via `ls ${SKILL_DIR}/templates/layouts/`.
+> **Failure handling**: If template directory doesn't contain a valid `design_spec.md`, report the invalid path and instruct user to list available templates via `ls ${SKILL_DIR}/templates/layouts/`.
 
 **✅ Checkpoint — Default path proceeds to Step 4 automatically.**
 
@@ -275,6 +315,8 @@ Read references/strategist.md
 
 #### Eight Confirmations
 
+🔴 **CHECKPOINT**: This is the **only** place where the agent must stop and wait for user input. All other steps proceed automatically.
+
 ⛔ **BLOCKING**: Present the Eight Confirmations as a bundled recommendation set and **wait for explicit user confirmation** before outputting design spec.
 
 1. **Canvas format** — 16:9 / 4:3 / story / custom
@@ -286,9 +328,17 @@ Read references/strategist.md
 7. **Typography plan** — including formula rendering policy (mixed/render-all/text-only)
 8. **Image usage approach** — AI-generated / web-sourced / user-provided / placeholder
 
-**Split-mode note** (mandatory, appended after the eight items):
-- Heavy (long deck / bulky sources): Recommend split mode — stop this chat, open fresh window, use `继续生成 projects/<name>` for Phase B
-- Normal: Default continuous mode; can switch to split mode any time with `继续生成 projects/<name>`
+**Split-mode decision** (mandatory, after presenting Eight Confirmations):
+
+**Split condition**: If ANY of the following is true, recommend split mode:
+- Estimated page count ≥ 15
+- Source material > 20 pages (PDF/DOCX) or > 5000 words
+- Image requirement ≥ 6 images (high token cost)
+- User explicitly asks for split mode
+
+**Continuous mode**: If none of the above conditions are met, proceed continuously (Steps 5→6→7 in one chat).
+
+**Split-mode behavior**: Stop this chat. Output Phase A hand-off marker (see Step 5). User opens fresh chat → `继续生成 projects/<name>` + phase-b-resume workflow.
 
 **Formula rendering policy** (inside item 7):
 | Policy | Behavior |
@@ -303,16 +353,25 @@ After confirmation and **before outputting `design_spec.md`**, if formula policy
 3. Run: `python3 ${SKILL_DIR}/scripts/latex_render.py <project_path>`
 4. Include rendered PNGs in `design_spec.md §VIII`
 
-**Output**:
+**Output sequence** (all three files required before proceeding):
+
+**Step 4.1** — Write design spec and execution lock:
 - `<project_path>/design_spec.md` — Human-readable design narrative
 - `<project_path>/spec_lock.md` — Machine-readable execution contract
 
+**Step 4.2** — Generate trimmed execution lock (reduces per-page Executor token consumption by 60-80%):
+```bash
+python3 ${SKILL_DIR}/scripts/spec_lock_minimal.py <project_path>
+# Output: <project_path>/spec_lock_minimal.md
+```
+
 **Checkpoint**:
 ```markdown
-## ✅ Strategist Phase Complete
+## 🔴 CHECKPOINT — Strategist Phase Gate
 - [x] Eight Confirmations completed (user confirmed)
 - [x] Design Specification & Content Outline generated
 - [x] spec_lock.md generated
+- [x] spec_lock_minimal.md generated (spec_lock_minimal.py ran)
 - [ ] **Next**: Auto-proceed to Image Acquisition / Executor
 ```
 
@@ -333,25 +392,8 @@ Then dispatch per `Acquire Via`:
 | Via | Load | Run |
 |-----|------|-----|
 | `ai` | `references/image-generator.md` | `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
-| `ai (agnes)` | `references/agnes-ai-image-provider.md` | ⚠️ **Do NOT use `image_gen.py`** — its OpenAI backend sends `response_format` param that Agnes rejects (400). Call Agnes API directly via Python `requests.post()` with minimal params (`model`/`prompt`/`n`/`size` only). See key handling below. |
+| `ai (agnes)` | `references/agnes-ai-image-provider.md` | ⚠️ `image_gen.py` OpenAI backend sends `response_format` param that Agnes rejects (400). Call Agnes API directly via Python `requests.post()` with just `model`/`prompt`/`n`/`size`. **CRITICAL — Key handling**: (a) NEVER write key in bash heredoc with `$` expansion; use Python `open().read()` from `.env`. (b) `.env` key with special chars is safe in the file but MUST be read by Python, never `source`d or `export`ed in shell. (c) Test pattern: `python3 << 'PYEOF'` (single-quoted heredoc delimiter prevents bash expansions) — then read key from `.env` inside the Python block. |
 | `web` | `references/image-searcher.md` | `python3 ${SKILL_DIR}/scripts/image_search.py ...` |
-
-> **⚠️ CRITICAL — Agnes API key handling**: Never let API key go through bash variable expansion. Always read from `.env` inside Python:
-> ```python
-> # Safe: Python reads .env directly (no bash expansion risk)
-> with open(".env") as f:
->     for line in f:
->         if line.startswith("OPENAI_API_KEY"):
->             key = line.strip().split("=", 1)[1]
->             break
-> r = requests.post(f"{base}/images/generations",
->     json={"model": "agnes-image-2.1-flash", "prompt": "...", "n": 1, "size": "1024x1024"},
->     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
->     timeout=120)
-> # Download returned URL:
-> img = requests.get(r.json()["data"][0]["url"], timeout=30)
-> ```
-> For bash heredoc, ALWAYS use single-quoted delimiter: `python3 << 'PYEOF'` (NOT `python3 << EOF`).
 
 Workflow:
 1. Extract all rows with `Status: Pending`, `Acquire Via ∈ {ai, web}`
@@ -367,12 +409,12 @@ Workflow:
 - [x] Each row: terminal status (no Pending remaining)
 ```
 
-**Default — auto-proceed to Step 6.** If user opted into split mode, output Phase A hand-off marker:
+**Default — auto-proceed to Step 6.** If split mode was triggered in Step 4, output Phase A hand-off marker instead:
 ```markdown
 ## ✅ Phase A Complete
 - [x] Spec: design_spec.md, spec_lock.md
 - [x] Resources: sources/, images/, templates/
-- [ ] **Next**: Open fresh chat → `继续生成 projects/<name>` + resume-execute workflow
+- [ ] **Next**: Open fresh chat → `继续生成 projects/<name>` + phase-b-resume workflow
 ```
 
 ---
@@ -400,7 +442,7 @@ python3 ${SKILL_DIR}/scripts/svg_editor/server.py <project_path> --live
 
 **Pre-generation Batch Read**: Before the first SVG, batch-read every distinct layout SVG in `spec_lock.page_layouts` and chart SVG in `spec_lock.page_charts`. One read per file, up front.
 
-**Per-page spec_lock re-read**: Before **each** SVG page, `read_file <project_path>/spec_lock.md`. Colors/fonts/icons/images from this file only. Also read `page_rhythm` / `page_layouts` / `page_charts` for that page.
+**Per-page spec_lock re-read**: Before **each** SVG page, `read_file <project_path>/spec_lock_minimal.md` (preferred) or `read_file <project_path>/spec_lock.md` (fallback if minimal not found). Colors/fonts/icons/images from this file only. Also read `page_rhythm` / `page_layouts` / `page_charts` for that page.
 
 **Visual Construction**: Generate SVG pages sequentially, one at a time → `<project_path>/svg_output/`.
 
@@ -460,6 +502,16 @@ python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
 | `--animation-trigger {on-click,with-previous,after-previous}` | Start mode. Default `after-previous` |
 | `--auto-advance <seconds>` | Kiosk-style auto-play |
 
+**Step 7.4** — Export HTML Deck (interactive presentation with presenter mode):
+```bash
+python3 ${SKILL_DIR}/scripts/html_export.py <project_path> --output exports/
+# Output: exports/deck.html (self-contained, all CSS/JS inlined)
+#         No external assets directory needed
+```
+Optional: `--theme <name>` to override auto-detection (minimal-white, corporate-clean, minimal-dark).
+
+> **html_export.py** reads SVG files from `svg_output/`, speaker notes from `notes/`, and design tokens from `spec_lock.md`. Produces a **single self-contained HTML file** with base64-encoded SVGs and **inlined** runtime.js/CSS (no external asset files needed). Keyboard navigation (←→ Space F S N O T A), speaker mode (4-card layout: current/next preview, script, timer), and theme switching (T key) all work out of the box.
+
 > **File list**: `finalize_svg.py` and `svg_to_pptx.py` do not detect missing image files at the script layer — if images are missing, the deck will have broken references. Verify files exist before Step 7.
 
 > **Paragraph editability vs line fidelity**: Default merge behavior collapses dy-stacked paragraphs into one editable text frame. Add `--no-merge` for strict line-layout fidelity.
@@ -472,6 +524,7 @@ python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
 - [x] Speaker notes split
 - [x] SVG post-processed
 - [x] Native .pptx exported at <path>
+- [x] HTML deck exported at exports/deck.html
 ```
 
 ---
@@ -499,7 +552,24 @@ Before switching roles, read the corresponding reference file. Output marker:
 | Icon library | `templates/icons/README.md` |
 | Animations | `references/animations.md` |
 | Design Tokens | `references/design-tokens.md` | 设计系统Token抽象层（L0/L1/L2） |
-| Verified pipeline | `references/verified-pipeline.md` |
+| Template Designer | `references/template-designer.md` | 模板设计规范：如何创建新的 layout/brand/deck 模板 |
+| Image Type Templates | `references/image-type-templates/_index.md` | 12种AI图片类型模板（流程图/矩阵/时间线/漏斗/场景等）的结构化提示词 |
+| Image Palettes | `references/image-palettes/_index.md` | 15种配色方案（tech-neon/editorial-classic/macaron等）的AI图片调色参考 |
+| Image Renderings | `references/image-renderings/` | 16种渲染风格（pixel-art/3d-isometric/glassmorphism等）的AI图片风格参考 |
+| Gap Analysis vs Competitors | `references/gap-analysis.md` | PPTAgent/Gorden/html-ppt/huashu/OpenDesign/guizang 对标 |
+| Speed Analysis | `references/speed-analysis.md` | 生成速度瓶颈分析：竞品对比、优化方案排序（spec_lock精简/Mirror模式/图片并行）、基准测试方法 |
+| Spec Lock Minimal | `references/spec-lock-minimal.md` | 精简版执行锁模板 — 只含Executor需要的运行时字段，减少60-80% token消耗 |
+| Spec Lock Minimal Script | `scripts/spec_lock_minimal.py` | 从 spec_lock.md 自动生成 spec_lock_minimal.md — 删除blockquote、长注释行，保留canvas/colors/typography/icons/images/page_rhythm/page_layouts/page_charts/forbidden |
+| Agnes AI Provider | `references/agnes-ai-image-provider.md` | 免费Agnes图片/视频生成API配置 |
+| Design innovation | `references/design-innovation.md` | 海洋创意设计: visual storytelling, emotional design, cultural integration |
+| Verified pipeline | `references/verified-pipeline.md` | 管线验证记录 |
+| Hermes runtime notes | `references/hermes-runtime.md` | Hermes 运行时特殊注意事项 |
+| html-ppt integration | `references/html-ppt-integration.md` | html-ppt-skill 核心资产分析、runtime.js 功能拆解、对接方案 |
+| html-export verification | `references/html-export-verification.md` | html_export.py 端到端验证记录、已知坑位、Windows 路径注意事项 |
+| html-export resource inlining | `references/html-export-resource-inlining.md` | HTML导出资源内联修复记录 |
+| README showcase pattern | `references/readme-showcase-pattern.md` | README嵌入截图展示效果的最佳实践 |
+| README maintenance | `references/readme-maintenance.md` | README维护规范：安装指令必须准确、跨平台同步、禁止伪造命令 |
+| Validate Skill | `references/validate_skill.md` | 技能验证规范：提交前必须通过 validate_skill.py 检查 |
 
 ---
 
@@ -507,14 +577,57 @@ Before switching roles, read the corresponding reference file. Output marker:
 
 - ❌ Do NOT combine steps 7.1/7.2/7.3 into one code block or shell invocation
 - ❌ Do NOT use `cp` as a substitute for `finalize_svg.py` — finalize does critical processing
-- ❌ Do NOT delegate SVG page generation to sub-agents
-- ❌ Do NOT batch SVG pages (5 at a time) — generate one by one
+- ❌ Do NOT delegate SVG page generation to sub-agents — the Executor phase requires the main agent's context to maintain cross-page visual continuity. Sub-agents lack upstream context and may hit tool-call limits before producing output. Generate one page at a time.
 - ❌ Do NOT pre-write SVG code during Strategist phase
 - ❌ Do NOT skip the Eight Confirmations ⛔ BLOCKING
 - ❌ Do NOT keep hardcoded personal paths, API keys, or credentials in the skill
 - ❌ Do NOT default to calling external APIs for PPT generation — this skill runs fully local
 - ❌ Do NOT use `git reset --hard` for rollback; use patch/revert
 - ❌ Do NOT write "supports everything" or "fully automatic" in user-facing descriptions — be specific
+- ❌ Do NOT let skill directories drift — after any SKILL.md or workflow update, sync all runtime copies. Missing test-prompts.json, mismatched scripts, and stale README are the most common drift failures. **Sync command**: `rsync -av --exclude='.git' <src>/ <dst>/` (Linux/macOS) or `xcopy /E /I <src> <dst>` (Windows). Paths are runtime-dependent: Hermes `~/.hermes/skills/productivity/ppt-master/`, CC `~/.claude/skills/ppt-master/`, Codex `~/.codex/skills/ppt-master/`. **Note**: Windows terminal is denied during skill review — use `write_file` with SKILL.md content to sync to CC when terminal is unavailable.
+- ❌ Do NOT test `image_gen.py` with `--prompt` — it takes prompt as a positional argument, not `--prompt` flag. Correct: `python image_gen.py "your prompt" --model <model>`
+- ❌ Do NOT use `/tmp` for test projects on Windows — git-bash maps `/tmp` to `%TEMP%` (C:\Users\fzx\AppData\Local\Temp), so files disappear between calls. Always use `D:\hermes\` paths for test projects.
+- ❌ Do NOT assume assets are in the same location as scripts — `html_export.py` and other scripts resolve `skill_dir` via `Path(__file__).resolve().parent.parent`. The secondary copy (e.g. `D:\hermes\`) may drift. Always verify `ls <actual_skill_path>/assets/` before running html_export.
+- ❌ Do NOT use single-quoted strings containing `Bearer *** in Windows git-bash curl — the shell mangles nested quotes. Write payloads to a temp JSON file and use `-d @file.json` instead
+- ❌ Do NOT mention `luban-skill` or any third-party skill manager in the README's quick-start — ppt-master-enhanced has **zero external dependencies** beyond Python packages (see `references/quick-start-fix.md`)
+- ❌ Do NOT invent fake install commands in README — `npx skills add`, `/plugin marketplace add` are NOT valid commands. README Quick Start must list actual installation methods: platform-specific (Hermes built-in, CC clone, Codex clone, GitHub ZIP download)
+- ❌ Do NOT skip `validate_skill.py` before committing changes — this is the automated verification gate required by the Luban discipline
+- ❌ Do NOT use full spec_lock.md for per-page re-read when spec_lock_minimal.md exists — always prefer the minimal version for Executor page generation to save 60-80% token cost
+
+## 🔍 Failure Modes & Troubleshooting
+
+### Installation Failures
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `pip install` fails with permission error | No admin/write access | Use `--user` flag or virtualenv: `python -m venv .venv && source .venv/bin/activate` |
+| `pip install` fails with wheel build error | Missing compiler (e.g., lxml, pillow) | Install system deps first: `apt-get install gcc libxml2-dev libxslt-dev` (Linux) or `brew install libxml2` (macOS) |
+| `officecli` not found | Not in PATH | Run `where officecli.exe` (Windows) or `which officecli` (Linux/macOS). If not found, install per platform docs |
+| `python3` not found on Windows | python.org installer uses `python` | Use `python` instead of `python3`. Or add to PATH: `setx PATH "%PATH%;C:\Python311"` |
+| PowerShell execution policy blocked | Windows default policy | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` in PowerShell as admin |
+
+### Runtime Failures
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `svg_quality_checker.py` reports spec_lock drift | Template auxiliary colors not in spec_lock | Safe to ignore — best practice: add `light_bg`, `muted`, `subtitle`, `footer`, `white` to spec_lock colors |
+| `svg_quality_checker.py` reports forbidden elements | SVG contains `<foreignObject>`, `rgba()`, `<style>` tags | Remove forbidden elements from SVG source or regenerate with cleaner SVG |
+| PPTX export produces blank pages | Missing image files in `images/` directory | Verify files exist before Step 7: `ls <project>/images/`. Missing images → broken references in PPTX |
+| PPTX export fails with XML error | Corrupted SVG or malformed DrawingML | Check `svg_output/` for malformed SVG. Run `finalize_svg.py` again before re-export |
+| Chinese characters show as boxes | Target machine lacks CJK fonts | Ensure Microsoft YaHei, SimSun, or Noto Sans CJK is installed on target machine |
+| `image_gen.py` returns 400 from Agnes | `response_format` param not supported | Call Agnes API directly via `requests.post()` with only `model`/`prompt`/`n`/`size` — skip `response_format` |
+| `image_gen.py` key handling fails | Shell `$` expansion corrupts API key | NEVER write key in bash heredoc. Use Python `open().read()` from `.env` file. Use single-quoted heredoc: `python3 << 'PYEOF'` |
+
+### What NOT to Use ppt-master For
+
+| Scenario | Better Alternative | Why |
+|----------|-------------------|-----|
+| 3-5 page simple PPT | OfficeCLI standalone flow | ppt-master overhead (8 confirmations, SVG pipeline) is overkill for tiny decks |
+| Need AI-generated images IN the PPT | Run ppt-master first, then Agnes API for images | ppt-master generates layout/shapes, not photographic images |
+| Real-time collaborative editing | Generate PPTX → use PowerPoint Online | ppt-master is a one-shot generator, not a collaboration tool |
+| Just read/analyze existing .pptx | Use `powerpoint` skill | ppt-master is for generation, not analysis |
+| Batch generate hundreds of PPTs | Write a wrapper script around this skill | This skill is designed for one-off, high-quality output, not bulk automation |
+| Need PDF output | Generate PPTX first, then convert | ppt-master outputs native PPTX. PDF conversion is a separate step |
 
 ## 🔒 Security & Safety
 
@@ -536,14 +649,15 @@ Before declaring the pipeline complete:
 - [ ] SVG pages generated, one by one (Step 6)
 - [ ] Quality check passed — 0 errors (Step 6)
 - [ ] Speaker notes generated (Step 6)
-- [ ] Post-processing complete (Step 7.1–7.3)
+- [ ] Post-processing complete (Step 7.1–7.4)
 - [ ] Native .pptx exported and path reported to user
+- [ ] HTML deck exported at exports/deck.html
 
 ---
 
 ## Notes
 
 - Local preview of SVG output: `python3 -m http.server -d <project_path>/svg_final 8000`
-- **Troubleshooting**: On layout overflow / export errors / blank images, check `docs/faq.md`
+- **Troubleshooting**: On layout overflow / export errors / blank images, check `scripts/docs/troubleshooting.md`
 - **Supported formats**: 16:9 (default), 4:3, story, xhs, custom
 - **Supported source types**: PDF, DOCX, XLSX, PPTX, MD, URL, EPUB, HTML, LaTeX, RST, CSV, conversation text

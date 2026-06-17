@@ -34,6 +34,26 @@ Recommend format based on scenario (see [`canvas-formats.md`](canvas-formats.md)
 
 Provide specific page count recommendation based on source document content volume.
 
+### b.5 Mirror Template Priority (Speed Optimization)
+
+When the source material has a clear visual reference (existing PPT, brand deck, competitor deck), **strongly recommend mirror-mode templates** over free-design templates. Mirror mode is 2-3x faster because:
+
+1. Executor copies the mirror SVG as-is, only edits text in-place
+2. No need to hand-write SVG layout, positioning, colors
+3. Visual quality is guaranteed by the source deck's professional design
+
+**When to recommend mirror mode**:
+- User provides an existing PPT file or screenshot
+- User has a brand template they want to replicate
+- Source material is a structured document (report, proposal, briefing)
+
+**When NOT to recommend mirror mode**:
+- Creative/promotional deck where visual novelty is the goal
+- Source material has no clear visual reference
+- Content requires non-standard layouts not available in mirror templates
+
+**Implementation**: When mirror mode is recommended, Strategist reads the mirror template's `design_spec.md §V Page Roster` and maps each project page to the closest mirror reference. The mapping goes into `spec_lock.md page_layouts`.
+
 ### c. Key Information Confirmation
 
 Confirm target audience, usage occasion, and core message; provide initial assessment based on document nature.
@@ -289,7 +309,7 @@ The script renders PNGs into `images/`, trying `codecogs`, `quicklatex`, `mathpa
 
 | Mode | Trigger | Mechanism |
 |---|---|---|
-| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 |
+| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 with mixed `ai` + `web` manifest — single `--manifest` call dispatches both AI and web requests in one pool |
 | **Path B** | `IMAGE_BACKEND` not configured AND host has a native image tool (Codex / Antigravity / Claude Code / similar) — auto-selected, no user prompting needed | Host-native generation |
 | **Offline Manual** | `IMAGE_BACKEND` not configured AND host has no native image tool | Prompts written to `images/image_prompts.json`; user generates externally and places files in `project/images/` |
 
@@ -303,7 +323,32 @@ When the deck includes any `ai` rows, Strategist locks a **deck-wide rendering**
 
 🚧 **GATE — before recommending values**: `read_file references/image-renderings/_index.md` and `read_file references/image-palettes/_index.md`. They contain the catalog, auto-selection tables, and a rendering × palette compatibility matrix.
 
-#### Three-candidate presentation (default path)
+#### h.6 Six-Step PPT Methodology Integration (Optional Enhancement)
+
+When the user requests enhanced content quality or the source material is complex, activate the Six-Step PPT Methodology workflow. This adds narrative depth and content refinement on top of the existing pipeline.
+
+**Activation trigger**: User says "帮我做个PPT"、"做演示文稿"、或任何PPT生成需求时，在八大确认项后询问是否启用六步法。
+
+**Three modes**:
+| Mode | Steps Activated | Use Case |
+|------|----------------|----------|
+| **完整模式** | 1→2→3→4→5→6 | 重要演讲、客户提案、学术答辩 |
+| **快速模式** | 1→2→5 | 内部汇报、日常分享 |
+| **标准模式** | 不激活 | 普通PPT生成，走现有管线 |
+
+**完整模式六步法**:
+1. 演示文稿顾问：定义目标、受众、核心信息、幻灯片流程 → `content_blueprint.md`
+2. 结构设计师：逐张幻灯片结构、标题、目的说明 → `slide_structure.md`
+3. 故事叙述师：开场-问题-洞察-解决方案-结论 → `story_arc.md`
+4. 视觉顾问：每页视觉指南、布局、图形、图表 → `visual_guidelines.md`
+5. 内容生成器：每页完整内容、简洁专业要点 → `page_content.md`
+6. 简化编辑器：审查、重写、减少文字、突出要点 → `final_content.md`
+
+**整合位置**: 六步法在 Step 4 战略家阶段后、Step 5 图像获取前激活。最终内容将注入 `design_spec.md §IX` 大纲和 `spec_lock.md` 的页面内容部分。
+
+**详细工作流**: 参见 `workflows/six-step-ppt-methodology.md`
+
+After the candidates, append one line:
 
 **Hard rule**: Unless the user has already named a specific rendering or palette (chat or template), present **≥3 distinct rendering × palette combinations** and let the user pick. Never auto-lock a single combination silently.
 
@@ -561,7 +606,7 @@ Side-by-side only: container ratio must match image ratio. Hero / atmosphere / a
 
 > **Multi-image slides**: When multiple images appear on one page, use the grid formulas in the "Multi-Image Layout" section of `references/image-layout-spec.md`.
 
-> **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
+> **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. **Both `ai` and `web` rows are dispatched in a single `--manifest` call** with mixed concurrency pool. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
 
 ### Template Match — Visualization + Structural Patterns (Non-blocking — Strategist recommends, no user confirmation needed)
 
@@ -747,6 +792,7 @@ Templates are starting points. The Strategist may adjust based on content and au
    - **Rhythm follows narrative, not quota**: `breathing` pages mark natural pauses — chapter transitions, standalone emphasis (hero quote / big number), SCQA bridges. Dense decks may legitimately be all `dense`. **Do NOT invent filler pages** ("Thank you", empty dividers) to pad rhythm — every `breathing` page must say something independent.
    - **page_layouts (write only when a template is in use)**: For each page that inherits a template SVG, add `P<NN>: <svg_basename>` (e.g., `P04: 03a_content_image_text`). Pages designed freely get **no entry** — Executor reads the absence as "free design, no inheritance". If zero pages use a template, omit the section entirely.
    - **page_charts (write only for chart pages that match a catalog template)**: For each page in `design_spec.md §VII` whose `reference template path` points to `templates/charts/<name>.svg`, add `P<NN>: <chart_name>`. Pages with `no-template-match` in §VII MUST NOT appear here (Executor would look for a non-existent reference). If the deck has no data-visualization pages, omit the section.
+5. **Generate spec_lock_minimal.md**: run `python3 scripts/spec_lock_minimal.py <project_path>` to produce a trimmed version of spec_lock.md containing only Executor-required fields (canvas, colors, typography, icons, images, page_rhythm, page_layouts, page_charts, forbidden) — no blockquotes, no design narrative. This reduces per-page token consumption by ~60-80%. If the script is unavailable, manually produce the minimal file following the template in `references/spec-lock-minimal.md`.
    - **Hard rule**: Use both `page_layouts` and `page_charts` for the same page only when the layout template is a compatible shell for the chart. Do not pair chart pages with conflicting page layouts (e.g., `waterfall_chart` + timeline layout, KPI cards + circle-diagram layout). If no compatible layout exists, omit the page from `page_layouts`.
 
 ---

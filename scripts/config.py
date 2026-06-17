@@ -162,7 +162,7 @@ def load_prefixed_env_file(
 CANVAS_FORMATS = {
     'ppt169': {
         'name': 'PPT 16:9',
-        'dimensions': '1280×720',
+        'dimensions': '1280x720',
         'viewbox': '0 0 1280 720',
         'width': 1280,
         'height': 720,
@@ -171,7 +171,7 @@ CANVAS_FORMATS = {
     },
     'ppt43': {
         'name': 'PPT 4:3',
-        'dimensions': '1024×768',
+        'dimensions': '1024x768',
         'viewbox': '0 0 1024 768',
         'width': 1024,
         'height': 768,
@@ -180,7 +180,7 @@ CANVAS_FORMATS = {
     },
     'wechat': {
         'name': 'WeChat Article Header',
-        'dimensions': '900×383',
+        'dimensions': '900x383',
         'viewbox': '0 0 900 383',
         'width': 900,
         'height': 383,
@@ -189,7 +189,7 @@ CANVAS_FORMATS = {
     },
     'xiaohongshu': {
         'name': '小红书',
-        'dimensions': '1242×1660',
+        'dimensions': '1242x1660',
         'viewbox': '0 0 1242 1660',
         'width': 1242,
         'height': 1660,
@@ -198,7 +198,7 @@ CANVAS_FORMATS = {
     },
     'moments': {
         'name': 'Moments/Instagram',
-        'dimensions': '1080×1080',
+        'dimensions': '1080x1080',
         'viewbox': '0 0 1080 1080',
         'width': 1080,
         'height': 1080,
@@ -207,7 +207,7 @@ CANVAS_FORMATS = {
     },
     'story': {
         'name': 'Story/Vertical',
-        'dimensions': '1080×1920',
+        'dimensions': '1080x1920',
         'viewbox': '0 0 1080 1920',
         'width': 1080,
         'height': 1920,
@@ -216,7 +216,7 @@ CANVAS_FORMATS = {
     },
     'banner': {
         'name': 'Horizontal Banner',
-        'dimensions': '1920×1080',
+        'dimensions': '1920x1080',
         'viewbox': '0 0 1920 1080',
         'width': 1920,
         'height': 1080,
@@ -225,7 +225,7 @@ CANVAS_FORMATS = {
     },
     'a4': {
         'name': 'A4 Print',
-        'dimensions': '1240×1754',
+        'dimensions': '1240x1754',
         'viewbox': '0 0 1240 1754',
         'width': 1240,
         'height': 1754,

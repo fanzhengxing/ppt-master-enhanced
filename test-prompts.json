@@ -31,9 +31,44 @@
     {
       "id": "test-005-template-with-brand",
       "name": "指定模板 + 品牌",
-      "prompt": "用 academic_defense 模板帮我做一份论文答辩PPT，源文件：[path/to/thesis.md]。另外品牌色用医疗蓝"  ,
+      "prompt": "用 academic_defense 模板帮我做一份论文答辩PPT，源文件：[path/to/thesis.md]。另外品牌色用医疗蓝",
       "expected_behavior": "Step 3 识别路径触发模板 → Step 4 八项确认包含风格调整",
       "verification": "产出符合学术模板风格的 .pptx"
+    },
+    {
+      "id": "test-006-medical-presentation",
+      "name": "医疗行业场景 — 基层慢病管理汇报",
+      "prompt": "帮我把这份慢病管理数据报告做成PPT：[path/to/chronic_disease_report.md]。目标受众是卫健委领导，风格要专业严肃，15-20页",
+      "expected_behavior": "触发 ppt-master 管线，Strategist 阶段确认受众为\"卫健委领导\"、风格\"专业严肃\"、页数15-20页，SVG 生成时注意医疗行业配色（蓝/白/绿）",
+      "verification": "产出医疗风格 .pptx，包含数据图表页、趋势分析页、结论页，颜色方案符合政府汇报风格"
+    },
+    {
+      "id": "test-007-academic-defense",
+      "name": "学术场景 — 学位论文答辩PPT",
+      "prompt": "我有一个博士学位论文答辩需要准备PPT，论文文件在 [path/to/dissertation.pdf]，帮我生成约25页的答辩PPT，要学术严谨风格",
+      "expected_behavior": "触发 ppt-master 管线，Strategist 阶段确认受众为\"学术评审委员会\"、风格\"学术严谨\"，页数25页，包含论文结构页、研究方法页、数据结果页、结论展望页",
+      "verification": "产出学术风格 .pptx，包含完整的论文答辩结构，公式渲染正确（LaTeX→PNG），参考文献页格式规范"
+    },
+    {
+      "id": "test-008-business-plan",
+      "name": "商业场景 — 融资BP",
+      "prompt": "帮我做一个融资商业计划书PPT，主题是智慧医疗SaaS平台，12页左右，风格要现代科技感",
+      "expected_behavior": "触发 topic-research 工作流（因为用户只给了主题）→ 搜集智慧医疗SaaS市场数据 → 回到 Step 1 生成PPT，Strategist 确认风格\"现代科技感\"，页数12页",
+      "verification": "产出包含市场分析页、产品方案页、商业模式页、财务预测页、团队介绍页的融资BP风格 .pptx"
+    },
+    {
+      "id": "test-009-validate-skill",
+      "name": "验证门 — 运行 validate_skill.py",
+      "prompt": "运行 validate_skill.py 检查 ppt-master 当前状态是否正常",
+      "expected_behavior": "执行 `python scripts/validate_skill.py`，输出8-9项检查结果",
+      "verification": "所有检查项通过（退出码0），文件结构对账一致，Python语法检查通过，git图标膨胀检查通过"
+    },
+    {
+      "id": "test-010-image-to-pptx",
+      "name": "图片逆向 — 截图还原可编辑PPTX",
+      "prompt": "我把这张PPT截图发给你，能还原成可编辑的PPTX吗？[path/to/screenshot.png]",
+      "expected_behavior": "触发 image-to-pptx 工作流 → 四层分解（layout.json）→ compose_pptx.py 合成可编辑PPTX",
+      "verification": "产出可编辑的 .pptx，文字可选中编辑，形状可调整，不是图片拼贴"
     }
   ]
 }

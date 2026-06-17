@@ -1,123 +1,138 @@
 ---
-name: visual-quality-check
-description: >-
-  SVG和PPTX的视觉质量检查——基于设计原则(对比度/留白/对齐/层级/一致性)，
-  在Step 6(Executor)完成后、Step 7(Export)前运行。可选（用户主动要求或用
-  design-tokens自动触发。参考guizang-ppt-skill的视觉质量增强思路。
+description: Post-SVG visual quality inspection — runs svg_quality_checker.py then AI scan for contrast, whitespace balance, and alignment across the full deck
 ---
 
-# Visual Quality Check — 视觉质量检查工作流
+# Visual Quality Check Workflow
 
-> 在 SVG 生成后、PPTX 导出前，对每页幻灯片做一次设计原则性的快速检查。
-> 不阻挡导出——但标记出可以改进的点。
-> 参考 guizang-ppt-skill 的"设计表达"思路，但走轻量级规则检测路线。
+> Standalone post-generation step. Run after Executor finishes all SVG pages and before post-processing & export. Catches both technical SVG violations (via script) and visual quality issues (contrast ratio, whitespace imbalance, alignment drift) via quick AI scan.
+>
+> This workflow is **independent** — safe to invoke in a fresh chat with only `<project_path>` as input.
 
-## 何时运行
+**Scope**: deck-level quality gate. For deep per-page rubric review with AI subagents scoring each slide individually, use [`visual-review`](./visual-review.md) instead. Run this first; escalate to visual-review only when the user explicitly asks.
 
-| 触发条件 | 行为 |
-|---------|------|
-| 用户明确说"检查质量/看看好不好看" | 运行全量检查 |
-| Step 6 完成后自动（默认） | 只跑 Pre-flight 快速检查（5秒） |
-| 用户说"帮我优化一下这页" | 运行并生成改进建议 |
+## When to Run
 
-## Pre-flight 快速检查（5项）
+- Executor (SKILL.md Step 6) has finished all SVG pages in `<project_path>/svg_output/`
+- Post-processing (`finalize_svg.py`, `svg_to_pptx.py`) has **not** yet run
+- User asks to "检查视觉质量" / "check visual quality" / "quality check" / "QC" the deck
 
-对每页 Slide 检查：
+## When NOT to Run
 
-```markdown
-## Pre-flight: <project_name>
+- SVG pages don't exist yet — finish Executor first
+- User asked for deep per-slide rubric review → use `visual-review` workflow instead
+- The deck has already been exported and the user only wants to read/share it → no re-check needed
 
-### 1. 对比度检查
-- 文本色 vs 背景色：WCAG AA (4.5:1) 通过/不通过
-- 强调元素 vs 环境色：是否有足够的视觉分离
+---
 
-### 2. 空白比例
-- 页面留白是否合理（不拥挤）
-- 卡片/元素之间间距是否均匀
+## Step 1: Technical Quality Check (Script)
 
-### 3. 对齐一致性
-- 同层级元素是否左对齐/居中
-- 标题和正文之间是否有固定偏移
-
-### 4. 文字层级
-- 标题/副标题/正文/Caption 是否可区分
-- 是否用了至少2种不同字号
-
-### 5. 颜色一致性
-- 所用颜色是否在 spec_lock 色板内
-- 语义色使用是否正确（绿=成功/增长，红=警告/下降）
+```bash
+python3 ${SKILL_DIR}/scripts/svg_quality_checker.py <project_path>
 ```
 
-## 深度检查（可选）
+The checker scans every `.svg` in `svg_output/` and reports:
 
-当 Pre-flight 标记了问题，或用户主动要求深入检查时：
+| Severity | Meaning | Action |
+|----------|---------|--------|
+| `error` | Forbidden SVG feature, broken XML, spec_lock drift, missing file | **Must fix before proceeding** |
+| `warning` | Suboptimal but exportable (e.g. template auxiliary color not in spec_lock) | Fix if straightforward; acknowledge and release otherwise |
 
-### 6. 留白密度评分
-```python
-# 估算每页的信息密度
-ratio = slide_content_area / total_slide_area
-# < 25% 太空，> 75% 太挤
-# 推荐范围：30%-60%（封页）、40%-70%（内容页）
-```
+**Common errors and fixes**:
 
-### 7. 视觉层次穿透性
-- 用户的眼睛第一落点在哪里？
-- 第二落点是什么？
-- 信息优先级是否通过视觉权重表达（大小/颜色/粗细/间距）？
+| Error | Fix |
+|-------|-----|
+| `<foreignObject>` found | Replace with native SVG text elements |
+| `rgba()` in fill/stroke | Change to `fill="#HEX" fill-opacity="0.X"` |
+| `<style>` or `class` attribute | Move all styles to inline attributes; remove `<style>` block |
+| `<symbol>` + `<use>` (non-icon) | Expand symbol inline; `<use data-icon="...">` is allowed |
+| HTML entity (`&mdash;`, `&nbsp;`) | Replace with raw Unicode character (`—`, ` `) |
+| Bare `&` or `<` in text | Escape as `&amp;` or `&lt;` |
+| Missing image file | Verify `images/` directory; re-run image acquisition if needed |
 
-### 8. 元素冲突检测
-- 是否有元素重叠（非故意）
-- 图片和文字是否挤压在一起
-- 是否有难以辨识的小字
+Fix all `error`-level issues, re-run the checker, and confirm 0 errors before Step 2.
 
-### 9. 风格一致性
-- 所有页面的字体/颜色/按钮样式是否统一
-- 图标风格是否一致（全部线型或全部填充型）
-- 动画节奏是否统一
+---
 
-## 输出格式
+## Step 2: Visual Quality Scan (AI)
 
-### 快速检查
-```markdown
-## ✅ Visual Quality Check 完成
-- 对比度：[5/5] 全部通过
-- 留白：[4/5] 第3页标题区域偏挤，建议增加padding
-- 对齐：[5/5] 全部通过
-- 文字层级：[4/5] 第5页数据标签偏小
-- 颜色一致性：[5/5] 全部符合spec_lock
+Read `<project_path>/spec_lock.md` (or `spec_lock_minimal.md`), then inspect each SVG in `svg_output/` sequentially across three quality dimensions:
 
-**可改进项（可选）**：
-1. 第3页：标题区域 padding 增加 0.5rem
-2. 第5页：数据标签增大 2pt
-```
+### A. Contrast
 
-### 深度检查
-```markdown
-## 🎨 深度视觉审查报告
+- **Text on background**: body text (`fill` on `<text>`) must achieve at least 4.5:1 contrast against the element behind it. Titles may use 3:1 when large (font-size ≥ 28px bold).
+- **Brand color on white**: check primary/accent colors defined in spec_lock against white (`#FFFFFF`) and the deck's background color.
+- **Flag**: any text element where estimated contrast < 3:1 against its immediate background.
 
-| Slide | 留白密度 | 对比度 | 层次感 | 一致性 | 整体评分 |
-|-------|:-------:|:-----:|:-----:|:-----:|:-------:|
-| 封面 | 45% ✅ | AA ✅ | 优 | — | A |
-| 第2页 | 35% ✅ | AA ✅ | 良 | ✅ | A |
-| 第3页 | 28% ⚠️ | AA ✅ | 中 | ✅ | B |
-| ... | ... | ... | ... | ... | ... |
+> Contrast estimation: approximate from HEX luminance. For `#RRGGBB`, relative luminance `L = 0.2126R + 0.7152G + 0.0722B` (linearized). Ratio = `(L_lighter + 0.05) / (L_darker + 0.05)`.
 
-**最值得改进的事**：
-1. P1：第3页信息密度偏高 → 拆成2页或减少条目
-2. P2：第5页数据标签小 → 改14pt
-```
+### B. Whitespace Balance
 
-## 规则文件
+Per slide, check:
+- **Content density**: if more than 75% of the viewBox area is covered by non-background elements, flag as over-dense.
+- **Margin clearance**: text elements closer than 40px to any canvas edge are flagged (default margin floor per `references/executor-base.md`).
+- **Blank gutters**: if a slide has a clearly split two-column layout, check that the gutter between columns is ≥ 40px.
 
-检查规则可以自动化，但当前阶段由 LLM 根据以上规则人工判断。
-未来可以考虑实现 `scripts/visual_qc.py` 做自动化检测（对比度、对齐、留白密度）。
+### C. Alignment
 
-## 与主流程的关系
+Scan for elements that are *almost* aligned but not quite — the most common visual polish issue:
+
+- **Grid drift**: elements in a grid (cards, list items, process steps) whose top/left edges differ by 1–5px when they should be identical.
+- **Text baseline drift**: adjacent text elements on the same visual row whose `y` coordinates differ by < 3px (should be identical) or between 3–8px (suspicious — flag for review).
+- **Icon-text misalignment**: `<use data-icon>` elements paired with adjacent `<text>` — their visual centers should align within 4px vertically.
+
+---
+
+## Step 3: Quality Report
+
+Output a compact structured report:
 
 ```
-Step 6 Executor → Visual QC (Pre-flight) → Step 7 Export
-                      ↓ (可选) 
-              深度检查 → 用户确认 → 改进SVG → 重新检查 → Step 7
+## Visual Quality Check — <project_name>
+
+### Script Check (svg_quality_checker.py)
+- Status: ✅ 0 errors, N warnings
+- [List any warnings with file names]
+
+### Contrast
+- ✅ All checked / ⚠️ N issues found
+- [Issue]: <page>.svg — <element description>: estimated ratio ~X:1 (minimum 4.5:1 required)
+
+### Whitespace Balance
+- ✅ All clear / ⚠️ N issues found
+- [Issue]: <page>.svg — [over-dense | margin violation | narrow gutter]
+
+### Alignment
+- ✅ All clear / ⚠️ N issues found
+- [Issue]: <page>.svg — <element description>: drift = Xpx
+
+### Summary
+- [N] issues require fixing before export
+- [N] advisory items (optional polish)
+- Recommended action: [proceed to Step 7 | fix N items first | escalate to visual-review for deep review]
 ```
 
-Visual QC **不阻塞导出**——只有 Optionally 在用户要求深度改进时才回退到 SVG 修改。
+---
+
+## Step 4: Fix Issues
+
+For each flagged issue:
+
+1. Read the affected SVG: `<project_path>/svg_output/<page>.svg`
+2. Apply the minimal fix (adjust `fill` color for contrast, shift coordinates for alignment, add margin for whitespace)
+3. Do NOT restructure the slide layout — only fix the flagged attribute
+
+After fixing, re-run Step 1 to confirm no new technical violations were introduced.
+
+---
+
+## After Quality Check
+
+Proceed to post-processing & export ([SKILL.md Step 7](../SKILL.md)):
+
+```bash
+python3 ${SKILL_DIR}/scripts/total_md_split.py <project_path>
+python3 ${SKILL_DIR}/scripts/finalize_svg.py <project_path>
+python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
+```
+
+If the user requested deeper per-page rubric review, run [`visual-review`](./visual-review.md) before Step 7.

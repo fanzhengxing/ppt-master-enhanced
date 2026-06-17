@@ -468,7 +468,7 @@ class ProjectManager:
         self._merge_image_manifest(rebased_items, images_dir / "image_manifest.json")
         print(
             f"Propagated {copied_count} image asset(s) + manifest "
-            f"from {asset_dir} → images/ (namespace: {namespace})"
+            f"from {asset_dir} -> images/ (namespace: {namespace})"
         )
 
     def _propagate_companion_image_assets(self, markdown_path: Path, project_dir: Path) -> None:

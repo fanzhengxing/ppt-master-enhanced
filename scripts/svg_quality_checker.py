@@ -1269,7 +1269,7 @@ class SVGQualityChecker:
         # Fix suggestions
         if self.summary['errors'] > 0 or self.summary['warnings'] > 0:
             print(f"\n[TIP] Common fixes:")
-            print(f"  1. XML well-formedness: write typography as raw Unicode (—, ©, →, NBSP); escape XML reserved chars as &amp; &lt; &gt; &quot; &apos; — never use HTML named entities like &nbsp; &mdash; &copy;")
+            print(f"  1. XML well-formedness: write typography as raw Unicode (em-dash, copyright, arrow, NBSP); escape XML reserved chars as &amp; &lt; &gt; &quot; &apos; -- never use HTML named entities like &nbsp; &mdash; &copy;")
             print(f"  2. viewBox issues: Ensure consistency with canvas format (see references/canvas-formats.md)")
             print(f"  3. foreignObject: Use <text> + <tspan> for manual line breaks")
             print(f"  4. Font issues: end every font-family stack with a PPT-safe family (e.g. Microsoft YaHei / Arial / Consolas)")
@@ -1337,10 +1337,10 @@ class SVGQualityChecker:
             return
         has_drift = any(self._drift_summary[cat] for cat in self._drift_summary)
         if not has_drift:
-            print("\n[OK] spec_lock drift: none — all colors, fonts, and sizes are anchored to spec_lock.md")
+            print("\n[OK] spec_lock drift: none -- all colors, fonts, and sizes are anchored to spec_lock.md")
             return
 
-        print("\nspec_lock drift — values used outside spec_lock.md:")
+        print("\nspec_lock drift -- values used outside spec_lock.md:")
         labels = [('colors', 'Colors'),
                   ('fonts', 'Font families'),
                   ('sizes', 'Font sizes')]
@@ -1422,7 +1422,7 @@ def print_usage() -> None:
     print("  --format <ppt169|ppt43|...>   Expected canvas format")
     print("  --template-mode               Validate a templates/{layouts,decks}/<id> directory:")
     print("                                  glob *.svg directly, skip spec_lock checks,")
-    print("                                  enforce roster ↔ design_spec.md Page Roster consistency,")
+    print("                                  enforce roster <-> design_spec.md Page Roster consistency,")
     print("                                  and emit advisory placeholder-convention warnings.")
 
 

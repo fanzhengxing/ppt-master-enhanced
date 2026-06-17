@@ -19,49 +19,49 @@ except ImportError:
     CANVAS_FORMATS = {
         'ppt169': {
             'name': 'PPT 16:9',
-            'dimensions': '1280×720',
+            'dimensions': '1280x720',
             'viewbox': '0 0 1280 720',
             'aspect_ratio': '16:9'
         },
         'ppt43': {
             'name': 'PPT 4:3',
-            'dimensions': '1024×768',
+            'dimensions': '1024x768',
             'viewbox': '0 0 1024 768',
             'aspect_ratio': '4:3'
         },
         'wechat': {
             'name': 'WeChat Article Header',
-            'dimensions': '900×383',
+            'dimensions': '900x383',
             'viewbox': '0 0 900 383',
             'aspect_ratio': '2.35:1'
         },
         'xiaohongshu': {
             'name': '小红书',
-            'dimensions': '1242×1660',
+            'dimensions': '1242x1660',
             'viewbox': '0 0 1242 1660',
             'aspect_ratio': '3:4'
         },
         'moments': {
             'name': 'Moments/Instagram',
-            'dimensions': '1080×1080',
+            'dimensions': '1080x1080',
             'viewbox': '0 0 1080 1080',
             'aspect_ratio': '1:1'
         },
         'story': {
             'name': 'Story/Vertical',
-            'dimensions': '1080×1920',
+            'dimensions': '1080x1920',
             'viewbox': '0 0 1080 1920',
             'aspect_ratio': '9:16'
         },
         'banner': {
             'name': 'Horizontal Banner',
-            'dimensions': '1920×1080',
+            'dimensions': '1920x1080',
             'viewbox': '0 0 1920 1080',
             'aspect_ratio': '16:9'
         },
         'a4': {
             'name': 'A4 Print',
-            'dimensions': '1240×1754',
+            'dimensions': '1240x1754',
             'viewbox': '0 0 1240 1754',
             'aspect_ratio': '√2:1'
         }

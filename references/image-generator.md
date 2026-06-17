@@ -478,7 +478,7 @@ Precedence:
 **Support tiers (recommended usage)**: Core / Extended / Experimental. Run `image_gen.py --list-backends` for the current assignments.
 
 **Concurrency (manifest mode)**:
-- Default 3 concurrent requests, halves on the first rate-limit response, minimum 1 (= serial fallback)
+- Default 5 concurrent requests, halves on the first rate-limit response, minimum 1 (= serial fallback)
 - Rate-limited items requeue automatically; per-item failures are recorded with `last_error` and skipped
 - Interrupting mid-run is safe — completed items keep `status: Generated` and are skipped on re-run
 - On normal completion the Markdown sidecar is re-rendered automatically; if the run is interrupted, run `--render-md` manually to refresh the sidecar

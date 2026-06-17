@@ -6,7 +6,7 @@
 > 本地执行，不依赖任何外部 API。SVG→DrawingML 管线，原生形状、动画、演讲备注全保留。
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-ppt--master-blueviolet)](SKILL.md)
-[![Stars](https://img.shields.io/github/stars/fanzhengxing/ppt-master-enhanced?style=flat&color=yellow)](https://github.com/fanzhengxing/ppt-master-enhanced)
+[![GitHub Stars](https://img.shields.io/github/stars/fanzhengxing/ppt-master-enhanced?style=flat&color=yellow)](https://github.com/fanzhengxing/ppt-master-enhanced)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Hermes · Claude Code · Codex · OpenClaw · 任何 skill-compatible runtime**
@@ -33,42 +33,36 @@
 - ✅ **演讲备注** — 自动生成每页备注，演讲时照着念
 - ✅ **入场动画** — 默认丰富动画，可定制
 - ✅ **多模板** — 学术答辩、政务蓝/红、医学大学、像素复古等 7+ 套布局
+- ✅ **HTML 演示文稿** — 自包含单文件 HTML，内联 CSS/JS，主题切换，演讲者视图
+- ✅ **全链路自包含** — 所有 CSS/JS 内联，无需外部资源，双击即用
+
+### 效果展示
+
+![Slide 1 — Cover](assets/showcase/showcase_slide1.png)
+
+![Slide 2 — Pipeline Architecture](assets/showcase/showcase_slide2.png)
+
+![Slide 3 — Data Cards](assets/showcase/showcase_slide3.png)
+
+> 💡 双击 `exports/deck.html` 即可打开，无需安装任何依赖。按 `S` 进入演讲者模式，按 `T` 切换主题。
 
 ## 快速开始
 
-### 方式一：Git 克隆（推荐）
+### 安装
 
-```bash
-# Hermes Agent（已安装到 skills.sh 市场前，手动装）
-cd ~/.hermes/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
-
-# Claude Code
-cd ~/.claude/skills/ && git clone https://github.com/fanzhengxing/ppt-master-enhanced.git ppt-master
-
-# Codex / OpenClaw / Cursor 等
-# 下载源码到对应 skills 目录即可：
-git clone https://github.com/fanzhengxing/ppt-master-enhanced.git <skills_dir>/ppt-master
-```
-
-### 方式二：下载 ZIP 包
-
-从 [GitHub Releases](https://github.com/fanzhengxing/ppt-master-enhanced/releases) 下载最新版 `ppt-master-enhanced.zip`，解压到对应 runtime 的 skills 目录下即可。
+| 平台 | 方式 |
+|------|------|
+| **Hermes Agent** | 技能已内置，无需额外安装 |
+| **Claude Code** | 克隆仓库到 `~/.claude/skills/ppt-master/` |
+| **Codex CLI** | 克隆仓库到 `~/.codex/skills/ppt-master/` |
+| **GitHub ZIP** | 点击 [Download ZIP](https://github.com/fanzhengxing/ppt-master-enhanced/archive/refs/heads/main.zip) |
 
 ### 使用
 
-装完后对 AI 说：
+对 AI 说：
 
 ```text
-加载 ppt-master skill
-```
-
-然后直接说需求：
-
-```text
-帮我把这份 PDF 做成 PPT：文件路径
-帮我把这篇论文做成答辩 PPT：文件路径
-根据这个 Excel 数据做一份汇报：文件路径
-帮我把这个网页内容做成演示：https://example.com
+帮我把这份文档做成 PPT：[文件路径/URL]
 ```
 
 ## 工作原理
@@ -109,20 +103,32 @@ git clone https://github.com/fanzhengxing/ppt-master-enhanced.git <skills_dir>/p
 | 政务红色 | `templates/layouts/government_red/` | 党建、重要会议 |
 | 医科大学 | `templates/layouts/medical_university/` | 医学汇报、医院报告 |
 | 像素复古 | `templates/layouts/pixel_retro/` | 创意演示、hackathon |
-| 心理学 | `templates/layouts/psychology_attachment/` | 心理咨询、教育 |
+|| 心理学 | `templates/layouts/psychology_attachment/` | 心理咨询、教育 |
 
 ## 它和同类有什么不同？
 
-| | 普通 Agent 做 PPT | **PPT Master** |
+### HTML 演示文稿（新增）
+
+除了传统的 .pptx 输出，ppt-master 还支持生成 **自包含 HTML 演示文稿**：
+
+- **零依赖** — 所有 CSS、JS、字体全部内联到单个 HTML 文件
+- **主题切换** — 内置 corporate-clean、minimal-white 等多种主题
+- **演讲者视图** — 按 `S` 键进入，支持备注提示
+- **离线可用** — 无需网络连接，双击即可打开
+- **交付位置** — `exports/deck.html` 或 `assets/deck.html`
+
+> 适合快速预览、邮件发送、无 PPT 环境的演示场景。
+
+|| | 普通 Agent 做 PPT | **PPT Master** |
 |---|---|---|
 | 输出产物 | HTML / Markdown / 文字描述 | **原生 .pptx**（可编辑） |
 | 排版引擎 | AI 临时构思 | **SVG→DrawingML 管线** |
 | 模板系统 | 无 / 硬编码 | 7+ 套独立布局 + 品牌预设 |
 | 演讲备注 | 通常没有 | ✓ 自动生成 |
-| 动画 | 无 | ✓ 入场动画 + 页面切换 |
-| 外部依赖 | 常需要 API (Gamma/美图) | **纯本地**，无需任何外部服务 |
-| 脚本资产 | 无 | 41 个 Python 脚本 + 11 个工作流 |
-| 编辑性 | 不可编辑 / 需重新生成 | ✓ 在 PowerPoint 里直接改 |
+|| 动画 | 无 | ✓ 入场动画 + 页面切换 |
+|| 外部依赖 | 常需要 API (Gamma/美图) | **纯本地**，无需任何外部服务 |
+|| 脚本资产 | 无 | 41 个 Python 脚本 + 11 个工作流 |
+|| 编辑性 | 不可编辑 / 需重新生成 | ✓ 在 PowerPoint / WPS / Keynote 里直接改 |
 
 ## 安全边界
 
