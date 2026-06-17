@@ -323,7 +323,32 @@ When the deck includes any `ai` rows, Strategist locks a **deck-wide rendering**
 
 🚧 **GATE — before recommending values**: `read_file references/image-renderings/_index.md` and `read_file references/image-palettes/_index.md`. They contain the catalog, auto-selection tables, and a rendering × palette compatibility matrix.
 
-#### Three-candidate presentation (default path)
+#### h.6 Six-Step PPT Methodology Integration (Optional Enhancement)
+
+When the user requests enhanced content quality or the source material is complex, activate the Six-Step PPT Methodology workflow. This adds narrative depth and content refinement on top of the existing pipeline.
+
+**Activation trigger**: User says "帮我做个PPT"、"做演示文稿"、或任何PPT生成需求时，在八大确认项后询问是否启用六步法。
+
+**Three modes**:
+| Mode | Steps Activated | Use Case |
+|------|----------------|----------|
+| **完整模式** | 1→2→3→4→5→6 | 重要演讲、客户提案、学术答辩 |
+| **快速模式** | 1→2→5 | 内部汇报、日常分享 |
+| **标准模式** | 不激活 | 普通PPT生成，走现有管线 |
+
+**完整模式六步法**:
+1. 演示文稿顾问：定义目标、受众、核心信息、幻灯片流程 → `content_blueprint.md`
+2. 结构设计师：逐张幻灯片结构、标题、目的说明 → `slide_structure.md`
+3. 故事叙述师：开场-问题-洞察-解决方案-结论 → `story_arc.md`
+4. 视觉顾问：每页视觉指南、布局、图形、图表 → `visual_guidelines.md`
+5. 内容生成器：每页完整内容、简洁专业要点 → `page_content.md`
+6. 简化编辑器：审查、重写、减少文字、突出要点 → `final_content.md`
+
+**整合位置**: 六步法在 Step 4 战略家阶段后、Step 5 图像获取前激活。最终内容将注入 `design_spec.md §IX` 大纲和 `spec_lock.md` 的页面内容部分。
+
+**详细工作流**: 参见 `workflows/six-step-ppt-methodology.md`
+
+After the candidates, append one line:
 
 **Hard rule**: Unless the user has already named a specific rendering or palette (chat or template), present **≥3 distinct rendering × palette combinations** and let the user pick. Never auto-lock a single combination silently.
 

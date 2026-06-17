@@ -6,7 +6,7 @@ description: >-
   13+ workflows cover 11+ scenes: topic research (standard + deep Research),
   image→PPTX reverse engineering (4-layer decompose), visual quality check,
   presenter view HTML, template fill, brand presets, chart verification,
-  custom animations, live preview. Design Token layer (L0/L1/L2) for
+  custom animations, live preview, six-step PPT methodology. Design Token layer (L0/L1/L2) for
   brand-consistent multi-template output. Gap analysis vs PPTAgent/Gorden/
   html-ppt/huashu/OpenDesign/guizang documented.
   Works cross-agent: Hermes, Claude Code, Codex, OpenClaw.
